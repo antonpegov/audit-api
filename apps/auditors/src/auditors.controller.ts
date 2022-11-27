@@ -1,9 +1,9 @@
-import { Controller, Post, Body, Logger, Get } from '@nestjs/common'
+import { Controller, Post, Body, Get } from '@nestjs/common'
 import { ApiCreatedResponse } from '@nestjs/swagger'
 
 import { Auditor } from '@auditors/schemas/auditor.schema'
+import { CreateAuditor } from '@auditors/dto/create-auditor.dto'
 import { AuditorsService } from '@auditors/auditors.service'
-import { CreateAuditorRequest } from '@auditors/dto/create-auditor.dto'
 
 @Controller('auditors')
 export class AuditorsController {
@@ -14,7 +14,7 @@ export class AuditorsController {
     description: 'The record has been successfully created.',
     type: Auditor,
   })
-  create(@Body() request: CreateAuditorRequest) {
+  create(@Body() request: CreateAuditor) {
     return this.auditorsService.createAuditor(request)
   }
 

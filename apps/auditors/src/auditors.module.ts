@@ -3,10 +3,10 @@ import { ConfigModule } from '@nestjs/config'
 import { Module } from '@nestjs/common'
 import * as Joi from 'joi'
 
-import { AuditorsService } from './auditors.service'
-import { AuditorsController } from './auditors.controller'
-import { AuditorsRepository } from './auditors.repository'
-import { Auditor, AuditorSchema } from './schemas/auditor.schema'
+import { AuditorsService } from '@auditors/auditors.service'
+import { AuditorsController } from '@auditors/auditors.controller'
+import { AuditorsRepository } from '@auditors/auditors.repository'
+import { Auditor, AuditorSchema } from '@auditors/schemas/auditor.schema'
 import { DatabaseModule, RmqModule } from '@app/common'
 
 @Module({

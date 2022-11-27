@@ -1,5 +1,5 @@
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
-import { Logger, ValidationPipe } from '@nestjs/common'
+import { ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 
@@ -28,6 +28,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document)
 
   await app.startAllMicroservices()
+  await app.listen(port)
 }
 
 bootstrap()

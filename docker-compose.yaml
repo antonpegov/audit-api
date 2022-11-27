@@ -18,6 +18,25 @@ services:
     ports:
       - '3000:3000'
 
+  projects:
+    build:
+      context: .
+      dockerfile: ./apps/projects/Dockerfile
+      target: development
+    command: npm run start:dev projects
+    env_file:
+      - ./apps/projects/.env
+    depends_on:
+      - rabbitmq
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3001:3000'
+
   rabbitmq:
     image: rabbitmq
     ports:
