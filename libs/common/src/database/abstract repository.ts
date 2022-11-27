@@ -1,5 +1,6 @@
-import { Logger, NotFoundException } from '@nestjs/common'
 import { FilterQuery, Model, Types, UpdateQuery, SaveOptions, Connection } from 'mongoose'
+import { Logger, NotFoundException } from '@nestjs/common'
+
 import { AbstractDocument } from './abstract.schema'
 
 export abstract class AbstractRepository<TDocument extends AbstractDocument> {
