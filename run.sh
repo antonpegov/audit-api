@@ -1,0 +1,4 @@
+#!/bin/sh
+# This script is used to run the application
+
+docker compose up -d -V
