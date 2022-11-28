@@ -1,15 +1,18 @@
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { Controller, Post, Body, Get } from '@nestjs/common'
-import { ApiCreatedResponse } from '@nestjs/swagger'
 
 import { Project } from '@projects/schemas/project.schema'
 import { CreateProject } from '@projects/dto/create-project.dto'
 import { ProjectsService } from '@projects/projects.service'
 
-@Controller('projects')
+const apiTag = 'projects'
+
+@Controller(apiTag)
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
+  @ApiTags(apiTag)
   @ApiCreatedResponse({
     description: 'The record has been successfully created.',
     type: Project,
@@ -19,9 +22,10 @@ export class ProjectsController {
   }
 
   @Get()
-  @ApiCreatedResponse({
+  @ApiTags(apiTag)
+  @ApiOkResponse({
     description: 'The records a successfully recieved.',
-    type: Project,
+    type: [Project],
   })
   find() {
     return this.projectsService.getProjects()
