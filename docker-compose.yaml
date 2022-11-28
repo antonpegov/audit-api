@@ -55,6 +55,7 @@ services:
       - projects
     volumes:
       - ./swagger/files/:/usr/share/nginx/html/files
+      - .:/usr/src/app
     ports:
       - '8080:80'
 

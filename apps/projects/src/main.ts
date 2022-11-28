@@ -1,5 +1,5 @@
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
-import { ValidationPipe } from '@nestjs/common'
+import { Logger, ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import * as YAML from 'json-to-pretty-yaml'
@@ -28,6 +28,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config)
 
   SwaggerModule.setup('api', app, document)
+
+  Logger.log('Writing the report...', 'Swagger')
+
   // fs.writeFile('swagger-projects.json', JSON.stringify(document), (err) => {
   fs.writeFile('swagger-projects.yaml', YAML.stringify(document), (err) => {
     if (err) console.log(err)
@@ -40,4 +43,3 @@ async function bootstrap() {
 }
 
 bootstrap()
-
