@@ -21,22 +21,22 @@ async function bootstrap() {
     .addTag('projects')
     .build()
 
+  app.enableCors()
   app.setGlobalPrefix(globalPrefix)
   app.useGlobalPipes(new ValidationPipe())
   app.connectMicroservice(rmqService.getOptions('PROJECTS'))
 
   const document = SwaggerModule.createDocument(app, config)
 
+  document.servers = [
+    {
+      url: `http://localhost:${port}`,
+      description: 'Local Projects API',
+    },
+  ]
   SwaggerModule.setup('api', app, document)
-
-  Logger.log('Writing the report...', 'Swagger')
-
-  // fs.writeFile('swagger-projects.json', JSON.stringify(document), (err) => {
   fs.writeFile('swagger-projects.yaml', YAML.stringify(document), (err) => {
     if (err) console.log(err)
-    else {
-      console.log('swagger.yaml file has been updated successfully\n')
-    }
   })
   await app.startAllMicroservices()
   await app.listen(port)

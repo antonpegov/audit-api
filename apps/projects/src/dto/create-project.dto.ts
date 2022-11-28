@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 
 export class CreateProject {
-  @ApiProperty()
+  @ApiProperty({ example: 'My Name' })
   @IsString()
   @IsNotEmpty()
   name: string
@@ -21,4 +21,3 @@ export class CreateProject {
   @IsNotEmpty()
   password: string
 }
-

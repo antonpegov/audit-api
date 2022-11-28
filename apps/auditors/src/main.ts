@@ -21,20 +21,22 @@ async function bootstrap() {
     .addTag('auditors')
     .build()
 
+  app.enableCors()
   app.setGlobalPrefix(globalPrefix)
   app.useGlobalPipes(new ValidationPipe())
   app.connectMicroservice(rmqService.getOptions('AUDITORS'))
 
   const document = SwaggerModule.createDocument(app, config)
 
+  document.servers = [
+    {
+      url: `http://localhost:${port}`,
+      description: 'Local Auditors API',
+    },
+  ]
   SwaggerModule.setup('api', app, document)
-
-  Logger.log('Writing the report...', 'Swagger')
   fs.writeFile('swagger-auditors.yaml', YAML.stringify(document), (err) => {
     if (err) console.log(err)
-    else {
-      console.log('swagger.yaml file has been updated successfully\n')
-    }
   })
 
   await app.startAllMicroservices()
