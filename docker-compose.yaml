@@ -1,5 +1,6 @@
 services:
   auditors:
+    container_name: auditors
     build:
       context: .
       dockerfile: ./apps/auditors/Dockerfile
@@ -19,6 +20,7 @@ services:
       - '3000:3000'
 
   projects:
+    container_name: projects
     build:
       context: .
       dockerfile: ./apps/projects/Dockerfile
@@ -38,11 +40,26 @@ services:
       - '3001:3000'
 
   rabbitmq:
+    container_name: rabbitmq
     image: rabbitmq
     ports:
       - '5672:5672'
 
+  swagger:
+    container_name: swagger
+    build: 
+      context: .
+      dockerfile: ./swagger/Dockerfile
+    depends_on:
+      - auditors
+      - projects
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - '8080:80'
+
   mongodb-primary:
+    container_name: mongodb-primary
     image: docker.io/bitnami/mongodb:5.0
     environment:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
@@ -55,6 +72,7 @@ services:
       - '27017:27017'
 
   mongodb-secondary:
+    container_name: mongodb-secondary
     image: docker.io/bitnami/mongodb:5.0
     depends_on:
       - mongodb-primary
@@ -66,6 +84,7 @@ services:
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
 
   mongodb-arbiter:
+    container_name: mongodb-arbiter
     image: docker.io/bitnami/mongodb:5.0
     depends_on:
       - mongodb-primary
