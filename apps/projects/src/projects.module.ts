@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common'
 import * as Joi from 'joi'
 
 import { ProjectsService } from '@projects/projects.service'
+import { AUDITORS_SERVICE } from '@projects/constants/services'
 import { ProjectsController } from '@projects/projects.controller'
 import { ProjectsRepository } from '@projects/projects.repository'
 import { Project, ProjectSchema } from '@projects/schemas/project.schema'
@@ -21,7 +22,9 @@ import { DatabaseModule, RmqModule } from '@app/common'
       }),
       envFilePath: './apps/projects/.env',
     }),
-    RmqModule,
+    RmqModule.register({
+      name: AUDITORS_SERVICE,
+    }),
     DatabaseModule,
     MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
   ],

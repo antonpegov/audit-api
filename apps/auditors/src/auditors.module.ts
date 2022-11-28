@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common'
 import * as Joi from 'joi'
 
 import { AuditorsService } from '@auditors/auditors.service'
+import { PROJECTS_SERVICE } from '@auditors/constants/services'
 import { AuditorsController } from '@auditors/auditors.controller'
 import { AuditorsRepository } from '@auditors/auditors.repository'
 import { Auditor, AuditorSchema } from '@auditors/schemas/auditor.schema'
@@ -21,7 +22,9 @@ import { DatabaseModule, RmqModule } from '@app/common'
       }),
       envFilePath: './apps/auditors/.env',
     }),
-    RmqModule,
+    RmqModule.register({
+      name: PROJECTS_SERVICE,
+    }),
     DatabaseModule,
     MongooseModule.forFeature([{ name: Auditor.name, schema: AuditorSchema }]),
   ],

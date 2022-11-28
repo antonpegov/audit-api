@@ -1,0 +1,1 @@
+export const AUDITORS_SERVICE = 'AUDITORS'
