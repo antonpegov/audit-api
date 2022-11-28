@@ -47,14 +47,14 @@ services:
 
   swagger:
     container_name: swagger
-    build: 
+    build:
       context: .
       dockerfile: ./swagger/Dockerfile
     depends_on:
       - auditors
       - projects
     volumes:
-      - .:/usr/src/app
+      - ./swagger/files/:/usr/share/nginx/html/files
     ports:
       - '8080:80'
 

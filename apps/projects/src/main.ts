@@ -28,6 +28,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config)
 
   SwaggerModule.setup('api', app, document)
+  // fs.writeFile('swagger-projects.json', JSON.stringify(document), (err) => {
   fs.writeFile('swagger-projects.yaml', YAML.stringify(document), (err) => {
     if (err) console.log(err)
     else {
@@ -39,3 +40,4 @@ async function bootstrap() {
 }
 
 bootstrap()
+

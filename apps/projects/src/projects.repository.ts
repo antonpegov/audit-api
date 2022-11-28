@@ -3,7 +3,6 @@ import { Injectable, Logger } from '@nestjs/common'
 import { Connection, Model } from 'mongoose'
 
 import { AbstractRepository } from '@app/common'
-
 import { Project } from '@projects/schemas/project.schema'
 
 @Injectable()
