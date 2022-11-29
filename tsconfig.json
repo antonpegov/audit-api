@@ -18,12 +18,30 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/common": ["libs/common/src"],
-      "@app/common/*": ["libs/common/src/*"],
-      "@auditors": ["apps/auditors/src"],
-      "@auditors/*": ["apps/auditors/src/*"],
-      "@projects": ["apps/projects/src"],
-      "@projects/*": ["apps/projects/src/*"],
+      "@app/common": [
+        "libs/common/src"
+      ],
+      "@app/common/*": [
+        "libs/common/src/*"
+      ],
+      "@auditors": [
+        "apps/auditors/src"
+      ],
+      "@auditors/*": [
+        "apps/auditors/src/*"
+      ],
+      "@projects": [
+        "apps/projects/src"
+      ],
+      "@projects/*": [
+        "apps/projects/src/*"
+      ],
+      "@users": [
+        "apps/users/src"
+      ],
+      "@users/*": [
+        "apps/users/src/*"
+      ]
     }
   }
 }

@@ -17,10 +17,10 @@
   <script>
     window.onload = () => {
       window.ui = SwaggerUIBundle({
-        // url: 'https://petstore3.swagger.io/api/v3/openapi.json',
         urls: [
+          { url: "files/swagger-users.yaml", name: "Users" },
           { url: "files/swagger-auditors.yaml", name: "Auditors" },
-          { url: "files/swagger-projects.yaml", name: "Projects" }
+          { url: "files/swagger-projects.yaml", name: "Projects" },
         ],
         dom_id: '#swagger-ui',
         presets: [

@@ -37,8 +37,8 @@ export class ProjectsController {
   }
 
   @EventPattern('auditor_created')
-  async handleOrderCreated(@Payload() data: any, @Ctx() context: RmqContext) {
-    this.projectsService.greetNewAuditor(data)
+  async handleAuditorCreated(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.projectsService.greetService(data)
     // remove the message from the queue
     this.rmqService.ack(context)
   }

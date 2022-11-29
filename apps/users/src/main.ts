@@ -6,36 +6,36 @@ import * as YAML from 'json-to-pretty-yaml'
 import * as fs from 'fs'
 
 import { RmqService } from '@app/common'
-import { AuditorsModule } from '@auditors/auditors.module'
+import { UsersModule } from '@users/users.module'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AuditorsModule)
+  const app = await NestFactory.create(UsersModule)
   const configService = app.get(ConfigService)
   const rmqService = app.get<RmqService>(RmqService)
   const globalPrefix = 'api'
   const port = configService.get('PORT')
   const config = new DocumentBuilder()
-    .setTitle('Auditors')
-    .setDescription('Auditors API')
+    .setTitle('Users')
+    .setDescription('Users API')
     .setVersion('0.1')
-    .addTag('auditors')
+    .addTag('users')
     .build()
 
   app.enableCors()
   app.setGlobalPrefix(globalPrefix)
   app.useGlobalPipes(new ValidationPipe())
-  app.connectMicroservice(rmqService.getOptions('AUDITORS'))
+  app.connectMicroservice(rmqService.getOptions('USERS'))
 
   const document = SwaggerModule.createDocument(app, config)
 
   document.servers = [
     {
       url: `http://localhost:${port}`,
-      description: 'Local Auditors API',
+      description: 'Local Users API',
     },
   ]
   SwaggerModule.setup('api', app, document)
-  fs.writeFile('swagger-auditors.yaml', YAML.stringify(document), (err) => {
+  fs.writeFile('swagger-users.yaml', YAML.stringify(document), (err) => {
     if (err) console.log(err)
   })
 

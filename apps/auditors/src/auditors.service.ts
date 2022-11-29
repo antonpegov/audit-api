@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { lastValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
 
@@ -9,6 +9,8 @@ import { AuditorsRepository } from '@auditors/auditors.repository'
 
 @Injectable()
 export class AuditorsService {
+  private readonly logger = new Logger(AuditorsService.name)
+
   constructor(
     private readonly auditorsRepository: AuditorsRepository,
     @Inject(PROJECTS_SERVICE) private projectsClient: ClientProxy,
@@ -25,6 +27,7 @@ export class AuditorsService {
           request,
         }),
       )
+      this.logger.log(`'auditor_created' emitted`)
       await session.commitTransaction()
       return auditor
     } catch (err) {
@@ -39,6 +42,11 @@ export class AuditorsService {
 
       return auditors
     })
+  }
+
+  greetService(data: any) {
+    console.log(data)
+    this.logger.log(data)
   }
 }
 
