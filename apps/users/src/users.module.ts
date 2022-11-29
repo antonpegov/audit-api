@@ -20,6 +20,8 @@ import { DatabaseModule, RmqModule } from '@app/common'
         PORT: Joi.number().required(),
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_USERS_QUEUE: Joi.string().required(),
+        RABBIT_MQ_AUDITORS_QUEUE: Joi.string().required(),
+        RABBIT_MQ_PROJECTS_QUEUE: Joi.string().required(),
       }),
       envFilePath: './apps/users/.env',
     }),

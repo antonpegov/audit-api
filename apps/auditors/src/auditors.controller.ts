@@ -1,5 +1,7 @@
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices'
 import { Controller, Post, Body, Get } from '@nestjs/common'
+import { RmqService } from '@app/common'
 
 import { Auditor } from '@auditors/schemas/auditor.schema'
 import { CreateAuditor } from '@auditors/dto/create-auditor.dto'
@@ -9,7 +11,10 @@ const apiTag = 'auditors'
 
 @Controller(apiTag)
 export class AuditorsController {
-  constructor(private readonly auditorsService: AuditorsService) {}
+  constructor(
+    private readonly auditorsService: AuditorsService,
+    private readonly rmqService: RmqService,
+  ) {}
 
   @Post()
   @ApiTags(apiTag)
@@ -30,4 +35,19 @@ export class AuditorsController {
   find() {
     return this.auditorsService.getAuditors()
   }
+
+  @EventPattern('project_created')
+  async handleProjectCreated(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.auditorsService.greetService(data)
+    // remove the message from the queue
+    this.rmqService.ack(context)
+  }
+
+  @EventPattern('user_created')
+  async handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.auditorsService.greetService(data)
+    // remove the message from the queue
+    this.rmqService.ack(context)
+  }
 }
+

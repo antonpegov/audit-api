@@ -4,8 +4,8 @@ import { ClientProxy } from '@nestjs/microservices'
 
 import { User } from '@users/schemas/user.schema'
 import { CreateUser } from '@users/dto/create-user.dto'
-import { AUDITORS_SERVICE, PROJECTS_SERVICE } from '@users/constants/services'
 import { UsersRepository } from '@users/users.repository'
+import { AUDITORS_SERVICE, PROJECTS_SERVICE } from '@users/constants/services'
 
 @Injectable()
 export class UsersService {

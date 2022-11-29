@@ -4,8 +4,8 @@ import { ClientProxy } from '@nestjs/microservices'
 
 import { Auditor } from '@auditors/schemas/auditor.schema'
 import { CreateAuditor } from '@auditors/dto/create-auditor.dto'
-import { PROJECTS_SERVICE } from '@auditors/constants/services'
 import { AuditorsRepository } from '@auditors/auditors.repository'
+import { PROJECTS_SERVICE, USERS_SERVICE } from '@auditors/constants/services'
 
 @Injectable()
 export class AuditorsService {
@@ -13,6 +13,7 @@ export class AuditorsService {
 
   constructor(
     private readonly auditorsRepository: AuditorsRepository,
+    @Inject(USERS_SERVICE) private usersClient: ClientProxy,
     @Inject(PROJECTS_SERVICE) private projectsClient: ClientProxy,
   ) {}
 
@@ -24,6 +25,11 @@ export class AuditorsService {
 
       await lastValueFrom(
         this.projectsClient.emit('auditor_created', {
+          request,
+        }),
+      )
+      await lastValueFrom(
+        this.usersClient.emit('auditor_created', {
           request,
         }),
       )

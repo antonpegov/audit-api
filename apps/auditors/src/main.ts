@@ -25,6 +25,7 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix)
   app.useGlobalPipes(new ValidationPipe())
   app.connectMicroservice(rmqService.getOptions('AUDITORS'))
+  Logger.log(`${configService.get<string>('RABBIT_MQ_AUDITORS_QUEUE')} quie activated`)
 
   const document = SwaggerModule.createDocument(app, config)
 
