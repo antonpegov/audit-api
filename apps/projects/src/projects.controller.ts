@@ -1,4 +1,10 @@
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import {
+  ApiCookieAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger'
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices'
 import { Controller, Post, Body, Get } from '@nestjs/common'
 import { RmqService } from '@app/common'
@@ -18,6 +24,8 @@ export class ProjectsController {
 
   @Post()
   @ApiTags(apiTag)
+  @ApiCookieAuth()
+  @ApiOperation({ summary: 'Creates new project' })
   @ApiCreatedResponse({
     description: 'The record has been successfully created.',
     type: Project,

@@ -18,6 +18,7 @@ import { PROJECTS_SERVICE, USERS_SERVICE } from '@auditors/constants/services'
         MONGODB_URI: Joi.string().required(),
         PORT: Joi.number().required(),
         RABBIT_MQ_URI: Joi.string().required(),
+        RABBIT_MQ_AUTH_QUEUE: Joi.string().required(),
         RABBIT_MQ_USERS_QUEUE: Joi.string().required(),
         RABBIT_MQ_AUDITORS_QUEUE: Joi.string().required(),
         RABBIT_MQ_PROJECTS_QUEUE: Joi.string().required(),

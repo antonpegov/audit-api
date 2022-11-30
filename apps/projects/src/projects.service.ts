@@ -51,7 +51,6 @@ export class ProjectsService {
   }
 
   greetService(data: any) {
-    console.log(data)
     this.logger.log(data)
   }
 }

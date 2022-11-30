@@ -1,9 +1,16 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import {
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+  UnprocessableEntityException,
+} from '@nestjs/common'
 import { lastValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
+import * as bcrypt from 'bcrypt'
 
 import { User } from '@users/schemas/user.schema'
-import { CreateUser } from '@users/dto/create-user.dto'
+import { CreateUserRequest } from '@users/dto/create-user.request'
 import { UsersRepository } from '@users/users.repository'
 import { AUDITORS_SERVICE, PROJECTS_SERVICE } from '@users/constants/services'
 
@@ -17,11 +24,30 @@ export class UsersService {
     @Inject(AUDITORS_SERVICE) private auditorsClient: ClientProxy,
   ) {}
 
-  async createUser(request: CreateUser): Promise<Omit<User, 'password'>> {
-    const session = await this.usersRepository.startTransaction()
+  private async validateCreateUserRequest(request: CreateUserRequest) {
+    let user: User
+    try {
+      user = await this.usersRepository.findOne({
+        email: request.email,
+      })
+    } catch (err) {}
+
+    if (user) {
+      throw new UnprocessableEntityException('Email already exists.')
+    }
+  }
+
+  async createUser(request: CreateUserRequest): Promise<Omit<User, 'password'>> {
+    let session, user
+
+    await this.validateCreateUserRequest(request)
+    session = await this.usersRepository.startTransaction()
 
     try {
-      const user = await this.usersRepository.create(request, { session })
+      user = await this.usersRepository.create({
+        ...request,
+        password: await bcrypt.hash(request.password, 10),
+      })
 
       await lastValueFrom(
         this.projectsClient.emit('user_created', {
@@ -33,7 +59,6 @@ export class UsersService {
           request,
         }),
       )
-      this.logger.log(`'user_created' emitted`)
       await session.commitTransaction()
       return user
     } catch (err) {
@@ -42,7 +67,7 @@ export class UsersService {
     }
   }
 
-  getUsers(): Promise<User[]> {
+  async getUsers(): Promise<Omit<User, 'password'>[]> {
     return this.usersRepository.find({}).then((users) => {
       users.forEach((user) => delete user.password)
 
@@ -50,8 +75,25 @@ export class UsersService {
     })
   }
 
-  greetService(data: any) {
-    console.log(data)
+  async getUser(getUserArgs: Partial<User>): Promise<Omit<User, 'password'>> {
+    return this.usersRepository.findOne(getUserArgs).then((user) => {
+      delete user.password
+
+      return user
+    })
+  }
+
+  async validateUser(email: string, password: string) {
+    const user = await this.usersRepository.findOne({ email })
+    const passwordIsValid = await bcrypt.compare(password, user.password)
+
+    if (!passwordIsValid) {
+      throw new UnauthorizedException('Credentials are not valid.')
+    }
+    return user
+  }
+
+  log(data: any) {
     this.logger.log(data)
   }
 }
