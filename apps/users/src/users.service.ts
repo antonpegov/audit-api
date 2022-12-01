@@ -13,6 +13,7 @@ import { User } from '@users/schemas/user.schema'
 import { CreateUserRequest } from '@users/dto/create-user.request'
 import { UsersRepository } from '@users/users.repository'
 import { AUDITORS_SERVICE, PROJECTS_SERVICE } from '@users/constants/services'
+import { PaginationOptions } from '@app/common'
 
 @Injectable()
 export class UsersService {
@@ -67,17 +68,24 @@ export class UsersService {
     }
   }
 
-  async getUsers(): Promise<Omit<User, 'password'>[]> {
-    return this.usersRepository.find({}).then((users) => {
-      users.forEach((user) => delete user.password)
+  async getUsers(
+    paginationOptions: PaginationOptions,
+  ): Promise<Omit<User, 'password'>[]> {
+    return this.usersRepository
+      .find({
+        skip: (paginationOptions.page - 1) * paginationOptions.limit,
+        take: paginationOptions.limit,
+      })
+      .then((users) => {
+        users.forEach((user) => delete user.password)
 
-      return users
-    })
+        return users
+      })
   }
 
-  async getUser(getUserArgs: Partial<User>): Promise<Omit<User, 'password'>> {
+  async getUser(getUserArgs: Partial<User>): Promise<User> {
     return this.usersRepository.findOne(getUserArgs).then((user) => {
-      delete user.password
+      // delete user.password
 
       return user
     })

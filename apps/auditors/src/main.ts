@@ -15,11 +15,7 @@ async function bootstrap() {
   const globalPrefix = 'api'
   const port = configService.get('PORT')
   const config = new DocumentBuilder()
-    .addCookieAuth('authCookie', {
-      type: 'http',
-      in: 'Header',
-      scheme: 'Bearer',
-    })
+    .addBearerAuth()
     .setTitle('Auditors')
     .setDescription('Auditors API')
     .setVersion('0.1')

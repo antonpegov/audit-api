@@ -3,7 +3,7 @@ import { lastValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
 
 import { Project } from '@projects/schemas/project.schema'
-import { CreateProject } from '@projects/dto/create-project.dto'
+import { CreateProjectRequest } from '@projects/dto/create-project.request'
 import { ProjectsRepository } from '@projects/projects.repository'
 import { AUDITORS_SERVICE, USERS_SERVICE } from '@projects/constants/services'
 
@@ -17,7 +17,7 @@ export class ProjectsService {
     @Inject(AUDITORS_SERVICE) private auditorsClient: ClientProxy,
   ) {}
 
-  async createProject(request: CreateProject): Promise<Omit<Project, 'password'>> {
+  async createProject(request: CreateProjectRequest): Promise<Omit<Project, 'password'>> {
     const session = await this.projectsRepository.startTransaction()
 
     try {

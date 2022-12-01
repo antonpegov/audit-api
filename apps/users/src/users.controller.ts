@@ -1,14 +1,23 @@
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
-import { Controller, Post, Body, Get } from '@nestjs/common'
-import { RmqService } from '@app/common'
+import { EventPattern, Payload, Ctx, RmqContext } from '@nestjs/microservices'
+import { Types } from 'mongoose'
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
+} from '@nestjs/common'
 
 import { User } from '@users/schemas/user.schema'
-import { CreateUserRequest } from '@users/dto/create-user.request'
 import { UsersService } from '@users/users.service'
-import { EventPattern, Payload, Ctx, RmqContext } from '@nestjs/microservices'
+import { CreateUserRequest } from '@users/dto/create-user.request'
+import { infinityPagination, RmqService } from '@app/common'
 
 const apiTag = 'users'
-
 @Controller(apiTag)
 export class UsersController {
   constructor(
@@ -28,12 +37,32 @@ export class UsersController {
 
   @Get()
   @ApiTags(apiTag)
+  @ApiOkResponse({ type: [User] })
+  async findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
+    if (limit > 50) {
+      limit = 50
+    }
+
+    return infinityPagination(
+      await this.usersService.getUsers({
+        page,
+        limit,
+      }),
+      { page, limit },
+    )
+  }
+
+  @Get(':id')
+  @ApiTags(apiTag)
   @ApiOkResponse({
-    description: 'The records a successfully recieved.',
-    type: [User],
+    description: 'The found record',
+    type: User,
   })
-  find() {
-    return this.usersService.getUsers()
+  findOne(@Param('id') id: string) {
+    return this.usersService.getUser({ _id: new Types.ObjectId(id) })
   }
 
   @EventPattern('project_created')

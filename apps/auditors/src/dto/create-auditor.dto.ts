@@ -8,7 +8,7 @@ export class CreateAuditor {
   @IsNotEmpty()
   name: string
 
-  @ApiProperty({ example: 'test1@example.com' })
+  @ApiProperty({ example: 'my@email.com' })
   @Transform(({ value }) => value?.toLowerCase().trim())
   @IsNotEmpty()
   // @Validate(IsNotExist, ['Auditor'], {
@@ -17,7 +17,8 @@ export class CreateAuditor {
   @IsEmail()
   email: string
 
-  @ApiProperty({ example: 'myPass1' })
+  @ApiProperty({ example: 'myPassword' })
   @IsNotEmpty()
   password: string
 }
+

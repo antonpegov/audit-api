@@ -1,0 +1,29 @@
+{
+  "todohighlight.isEnable": true,
+  "todohighlight.keywordsPattern": "@[A-Z][\\w-_]*",
+  "todohighlight.isCaseSensitive": true,
+  "todohighlight.defaultStyle": {
+      // "color": "#fbbe45cc",
+      // "fontWeight": "bold"
+      "color": "#888",
+      "backgroundColor": "0",
+  },
+  "todohighlight.include": [
+      "**/*.js",
+      "**/*.ts",
+      "**/*.vue",
+  ],
+  "todohighlight.exclude": [
+      "**/node_modules/**",
+      "**/bower_components/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.vscode/**",
+      "**/.github/**",
+      "**/_output/**",
+      "**/*.min.*",
+      "**/*.map",
+      "**/.next/**"
+  ],
+  "todohighlight.maxFilesForSearch": 5120,
+}

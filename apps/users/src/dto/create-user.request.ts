@@ -11,7 +11,7 @@ export class CreateUserRequest {
   @IsEmail()
   @IsNotEmpty()
   @Transform(({ value }) => value?.toLowerCase().trim())
-  @ApiProperty({ example: 'test1@example.com' })
+  @ApiProperty({ example: 'my@email1.com' })
   // @Validate(IsNotExist, ['User'], {
   //   message: 'emailAlreadyExists',
   // })
@@ -19,7 +19,7 @@ export class CreateUserRequest {
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'myPass1' })
+  @ApiProperty({ example: 'myPassword1' })
   password: string
 }
 

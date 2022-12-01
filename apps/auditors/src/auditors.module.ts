@@ -8,10 +8,24 @@ import { AuditorsController } from '@auditors/auditors.controller'
 import { AuditorsRepository } from '@auditors/auditors.repository'
 import { Auditor, AuditorSchema } from '@auditors/schemas/auditor.schema'
 import { DatabaseModule, RmqModule } from '@app/common'
-import { PROJECTS_SERVICE, USERS_SERVICE } from '@auditors/constants/services'
+import {
+  AUTH_SERVICE,
+  PROJECTS_SERVICE,
+  USERS_SERVICE,
+} from '@auditors/constants/services'
 
 @Module({
   imports: [
+    DatabaseModule,
+    RmqModule.register({
+      name: PROJECTS_SERVICE,
+    }),
+    RmqModule.register({
+      name: USERS_SERVICE,
+    }),
+    RmqModule.register({
+      name: AUTH_SERVICE,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
@@ -25,13 +39,6 @@ import { PROJECTS_SERVICE, USERS_SERVICE } from '@auditors/constants/services'
       }),
       envFilePath: './apps/auditors/.env',
     }),
-    RmqModule.register({
-      name: PROJECTS_SERVICE,
-    }),
-    RmqModule.register({
-      name: USERS_SERVICE,
-    }),
-    DatabaseModule,
     MongooseModule.forFeature([{ name: Auditor.name, schema: AuditorSchema }]),
   ],
   controllers: [AuditorsController],

@@ -2,7 +2,7 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 
-export class CreateProject {
+export class CreateProjectRequest {
   @ApiProperty({ example: 'My Name' })
   @IsString()
   @IsNotEmpty()
@@ -21,3 +21,4 @@ export class CreateProject {
   @IsNotEmpty()
   password: string
 }
+

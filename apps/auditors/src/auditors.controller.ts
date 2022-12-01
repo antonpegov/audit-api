@@ -1,15 +1,17 @@
+import { Controller, Post, Body, Get, UseGuards, Req, Logger } from '@nestjs/common'
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices'
+import { RmqService } from '@app/common'
 import {
+  ApiBearerAuth,
   ApiCookieAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger'
-import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices'
-import { Controller, Post, Body, Get } from '@nestjs/common'
-import { RmqService } from '@app/common'
 
 import { Auditor } from '@auditors/schemas/auditor.schema'
+import { JwtAuthGuard } from '@auditors/guards/jwt-auth.guard'
 import { CreateAuditor } from '@auditors/dto/create-auditor.dto'
 import { AuditorsService } from '@auditors/auditors.service'
 
@@ -25,12 +27,12 @@ export class AuditorsController {
   @Post()
   @ApiTags(apiTag)
   @ApiCookieAuth()
-  @ApiOperation({ summary: 'Creates new auditor' })
-  @ApiCreatedResponse({
-    description: 'The record has been successfully created.',
-    type: Auditor,
-  })
-  create(@Body() request: CreateAuditor) {
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiCreatedResponse({ type: Auditor })
+  create(@Body() request: CreateAuditor, @Req() req: any) {
+    Logger.log('request: ' + JSON.stringify(request))
+
     return this.auditorsService.createAuditor(request)
   }
 

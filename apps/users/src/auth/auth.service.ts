@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { Response } from 'express'
@@ -15,21 +15,30 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(user: User, response: Response) {
-    const tokenPayload: TokenPayload = {
-      userId: user._id.toHexString(),
+  async login(user: User) {
+    try {
+      const tokenPayload: TokenPayload = {
+        userId: user._id.toHexString(),
+      }
+      const expires = new Date()
+      const expitesInSeconds = this.configService.get('JWT_EXP')
+
+      expires.setSeconds(expires.getSeconds() + expitesInSeconds)
+
+      const token = this.jwtService.sign(tokenPayload)
+
+      return { token, user: user }
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            password: 'incorrectPassword',
+          },
+        },
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      )
     }
-    const expires = new Date()
-    const expitesInSeconds = this.configService.get('JWT_EXP')
-    expires.setSeconds(expires.getSeconds() + expitesInSeconds)
-
-    const token = this.jwtService.sign(tokenPayload)
-
-    console.log(user, expires, token, expitesInSeconds)
-    response.cookie('Authentication', token, {
-      httpOnly: true,
-      expires,
-    })
   }
 
   logout(response: Response) {
@@ -37,6 +46,10 @@ export class AuthService {
       httpOnly: true,
       expires: new Date(),
     })
+  }
+
+  validateToken(jwt: string) {
+    return this.jwtService.verify(jwt)
   }
 }
 

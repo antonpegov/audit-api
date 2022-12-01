@@ -1,14 +1,14 @@
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common'
 import { MessagePattern } from '@nestjs/microservices'
-import { Response } from 'express'
 
 import { User } from '@users/schemas/user.schema'
-import JwtAuthGuard from '@users/auth/auth-guards/jwt-auth.guard'
 import { AuthService } from '@users/auth/auth.service'
 import { CurrentUser } from '@users/decorators/current-user.decorator'
-import { LocalAuthGuard } from '@users/auth/auth-guards/local-auth.guard'
 import { LoginRequest } from '@users/dto/login.request'
+import { LoginResponse } from '@users/dto/login.response'
+import { LocalAuthGuard } from '@users/auth/auth-guards/local-auth.guard'
+import JwtAuthGuard from './auth-guards/jwt-auth.guard'
 
 const apiTag = 'auth'
 
@@ -19,23 +19,24 @@ export class AuthController {
   @Post('login')
   @ApiTags(apiTag)
   @UseGuards(LocalAuthGuard)
-  @ApiOkResponse({
-    description: 'Login success.',
-    type: User,
-  })
+  @ApiOkResponse({ type: LoginResponse })
   async login(
     @Body() req: LoginRequest,
     @CurrentUser() user: User,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    await this.authService.login(user, response)
-    response.send(user)
+  ): Promise<LoginResponse> {
+    return this.authService.login(user)
   }
 
-  @UseGuards(JwtAuthGuard)
   @MessagePattern('validate_user')
-  async validateUser(@CurrentUser() user: User) {
-    return user
+  async validateUser(data) {
+    console.log('validateUserByData:', data)
+    try {
+      const res = this.authService.validateToken(data.jwt)
+
+      return res
+    } catch (e) {
+      return null
+    }
   }
 }
 
