@@ -14,6 +14,8 @@ import {
   USERS_SERVICE,
 } from '@projects/constants/services'
 
+const envFilePath =
+  process.env.NODE_ENV === 'production' ? './.env.projects' : './apps/projects/.env'
 @Module({
   imports: [
     DatabaseModule,
@@ -37,7 +39,7 @@ import {
         RABBIT_MQ_AUDITORS_QUEUE: Joi.string().required(),
         RABBIT_MQ_PROJECTS_QUEUE: Joi.string().required(),
       }),
-      envFilePath: './apps/projects/.env',
+      envFilePath,
     }),
     MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
   ],
@@ -45,4 +47,3 @@ import {
   providers: [ProjectsService, ProjectsRepository],
 })
 export class ProjectsModule {}
-

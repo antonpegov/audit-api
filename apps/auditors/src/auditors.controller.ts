@@ -26,7 +26,6 @@ export class AuditorsController {
 
   @Post()
   @ApiTags(apiTag)
-  @ApiCookieAuth()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: Auditor })
@@ -38,10 +37,7 @@ export class AuditorsController {
 
   @Get()
   @ApiTags(apiTag)
-  @ApiOkResponse({
-    description: 'The records a successfully recieved.',
-    type: [Auditor],
-  })
+  @ApiOkResponse({ type: [Auditor] })
   find() {
     return this.auditorsService.getAuditors()
   }

@@ -14,6 +14,8 @@ import {
   USERS_SERVICE,
 } from '@auditors/constants/services'
 
+const envFilePath =
+  process.env.NODE_ENV === 'production' ? './.env.auditors' : './apps/auditors/.env'
 @Module({
   imports: [
     DatabaseModule,
@@ -30,6 +32,7 @@ import {
       isGlobal: true,
       validationSchema: Joi.object({
         MONGODB_URI: Joi.string().required(),
+        SERVER: Joi.string().required(),
         PORT: Joi.number().required(),
         RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_AUTH_QUEUE: Joi.string().required(),
@@ -37,7 +40,7 @@ import {
         RABBIT_MQ_AUDITORS_QUEUE: Joi.string().required(),
         RABBIT_MQ_PROJECTS_QUEUE: Joi.string().required(),
       }),
-      envFilePath: './apps/auditors/.env',
+      envFilePath,
     }),
     MongooseModule.forFeature([{ name: Auditor.name, schema: AuditorSchema }]),
   ],
@@ -45,4 +48,3 @@ import {
   providers: [AuditorsService, AuditorsRepository],
 })
 export class AuditorsModule {}
-

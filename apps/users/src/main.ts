@@ -12,13 +12,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AuthModule)
   const configService = app.get(ConfigService)
   const rmqService = app.get<RmqService>(RmqService)
-  const globalPrefix = 'api'
+  const server = configService.get('SERVER')
   const port = configService.get('PORT')
   const config = new DocumentBuilder()
     .addCookieAuth('authCookie', {
       type: 'http',
       in: 'Header',
-      scheme: 'Bearer'
+      scheme: 'Bearer',
     })
     .setTitle('Users')
     .setDescription('Users API')
@@ -27,29 +27,38 @@ async function bootstrap() {
     .build()
 
   app.enableCors()
-  app.setGlobalPrefix(globalPrefix)
+  app.setGlobalPrefix('api')
   app.useGlobalPipes(new ValidationPipe())
   app.connectMicroservice(rmqService.getOptions('USERS'))
   app.connectMicroservice(rmqService.getOptions('AUTH'))
   Logger.log(`${configService.get<string>('RABBIT_MQ_USERS_QUEUE')} quie activated`)
   Logger.log(`${configService.get<string>('RABBIT_MQ_AUTH_QUEUE')} quie activated`)
+  Logger.log(`MongoDB connection string: ${configService.get<string>('MONGODB_URI')}`)
+  await app.startAllMicroservices()
 
+  //#region Swagger
   const document = SwaggerModule.createDocument(app, config)
+  const swaggerPath = 'swagger-users.yaml'
+  const apiURL = `${server}:${port}`
 
   document.servers = [
     {
-      url: `http://localhost:${port}`,
-      description: 'Local Users API',
+      url: apiURL,
+      description: 'Users API',
     },
   ]
+
   SwaggerModule.setup('api', app, document)
+  Logger.log(`Writing ${swaggerPath} file for ${apiURL}...`)
+
   fs.writeFile('swagger-users.yaml', YAML.stringify(document), (err) => {
     if (err) console.log(err)
   })
 
-  await app.startAllMicroservices()
+  Logger.log(`Writing ${swaggerPath} file... Done`)
+  //#endregion
+
   await app.listen(port)
 }
 
 bootstrap()
-

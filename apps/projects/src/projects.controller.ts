@@ -25,7 +25,6 @@ export class ProjectsController {
 
   @Post()
   @ApiTags(apiTag)
-  @ApiCookieAuth()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: Project })
@@ -35,10 +34,7 @@ export class ProjectsController {
 
   @Get()
   @ApiTags(apiTag)
-  @ApiOkResponse({
-    description: 'The records a successfully recieved.',
-    type: [Project],
-  })
+  @ApiOkResponse({ type: [Project] })
   find() {
     return this.projectsService.getProjects()
   }

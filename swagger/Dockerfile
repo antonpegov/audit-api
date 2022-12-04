@@ -9,6 +9,6 @@ COPY ./swagger/index.html .
 COPY ./swagger/nginx.conf /etc/nginx/conf.d/default.conf
 COPY ./swagger/start.sh .
 
-RUN chmod a+rx ./start.sh
+RUN chmod +x ./start.sh
 
 ENTRYPOINT [ "./start.sh" ]

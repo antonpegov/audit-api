@@ -11,6 +11,8 @@ import { PROJECTS_SERVICE } from '@users/constants/services'
 import { User, UserSchema } from '@users/schemas/user.schema'
 import { DatabaseModule, RmqModule } from '@app/common'
 
+const envFilePath =
+  process.env.NODE_ENV === 'production' ? '.env.users' : './apps/users/.env'
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,7 +26,7 @@ import { DatabaseModule, RmqModule } from '@app/common'
         RABBIT_MQ_AUDITORS_QUEUE: Joi.string().required(),
         RABBIT_MQ_PROJECTS_QUEUE: Joi.string().required(),
       }),
-      envFilePath: './apps/users/.env',
+      envFilePath,
     }),
     RmqModule.register({
       name: PROJECTS_SERVICE,
@@ -40,4 +42,3 @@ import { DatabaseModule, RmqModule } from '@app/common'
   exports: [UsersService],
 })
 export class UsersModule {}
-

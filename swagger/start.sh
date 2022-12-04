@@ -7,9 +7,8 @@ runWithDelay () {
   "${@}";
 }
 
-
-echo "Copying swagger reports from host to container with delay of 30 seconds"
-runWithDelay 30 cp /usr/src/app/swagger-auditors.yaml /usr/share/nginx/html/files
+echo "Copying swagger reports from host to container with delay of 60 seconds"
+runWithDelay 60 cp /usr/src/app/swagger-auditors.yaml /usr/share/nginx/html/files
 cp /usr/src/app/swagger-projects.yaml /usr/share/nginx/html/files
 cp /usr/src/app/swagger-users.yaml /usr/share/nginx/html/files
 

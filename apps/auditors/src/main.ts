@@ -12,7 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AuditorsModule)
   const configService = app.get(ConfigService)
   const rmqService = app.get<RmqService>(RmqService)
-  const globalPrefix = 'api'
+  const server = configService.get('SERVER')
   const port = configService.get('PORT')
   const config = new DocumentBuilder()
     .addBearerAuth()
@@ -23,27 +23,36 @@ async function bootstrap() {
     .build()
 
   app.enableCors()
-  app.setGlobalPrefix(globalPrefix)
+  app.setGlobalPrefix('api')
   app.useGlobalPipes(new ValidationPipe())
   app.connectMicroservice(rmqService.getOptions('AUDITORS'))
+  Logger.log(`MongoDB connection string: ${configService.get<string>('MONGODB_URI')}`)
   Logger.log(`${configService.get<string>('RABBIT_MQ_AUDITORS_QUEUE')} quie activated`)
+  await app.startAllMicroservices()
 
+  //#region Swagger
   const document = SwaggerModule.createDocument(app, config)
+  const swaggerPath = 'swagger-auditors.yaml'
+  const apiURL = `${server}:${port}`
 
   document.servers = [
     {
-      url: `http://localhost:${port}`,
-      description: 'Local Auditors API',
+      url: apiURL,
+      description: 'Auditors API',
     },
   ]
+
   SwaggerModule.setup('api', app, document)
+  Logger.log(`Writing ${swaggerPath} file for ${apiURL}...`)
+
   fs.writeFile('swagger-auditors.yaml', YAML.stringify(document), (err) => {
     if (err) console.log(err)
   })
 
-  await app.startAllMicroservices()
+  Logger.log(`Writing ${swaggerPath} file... Done`)
+  //#endregion
+
   await app.listen(port)
 }
 
 bootstrap()
-

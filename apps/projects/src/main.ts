@@ -12,7 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(ProjectsModule)
   const configService = app.get(ConfigService)
   const rmqService = app.get<RmqService>(RmqService)
-  const globalPrefix = 'api'
+  const server = configService.get('SERVER')
   const port = configService.get('PORT')
   const config = new DocumentBuilder()
     .addBearerAuth()
@@ -23,26 +23,35 @@ async function bootstrap() {
     .build()
 
   app.enableCors()
-  app.setGlobalPrefix(globalPrefix)
+  app.setGlobalPrefix('api')
   app.useGlobalPipes(new ValidationPipe())
   app.connectMicroservice(rmqService.getOptions('PROJECTS'))
   Logger.log(`${configService.get<string>('RABBIT_MQ_PROJECTS_QUEUE')} quie activated`)
+  Logger.log(`MongoDB connection string: ${configService.get<string>('MONGODB_URI')}`)
+  await app.startAllMicroservices()
 
+  //#region Swagger
   const document = SwaggerModule.createDocument(app, config)
+  const swaggerPath = 'swagger-projects.yaml'
+  const apiURL = `${server}:${port}`
 
   document.servers = [
     {
-      url: `http://localhost:${port}`,
-      description: 'Local Projects API',
+      url: apiURL,
+      description: 'Projects API',
     },
   ]
   SwaggerModule.setup('api', app, document)
-  fs.writeFile('swagger-projects.yaml', YAML.stringify(document), (err) => {
+  Logger.log(`Writing ${swaggerPath} filefor ${apiURL}...`)
+
+  fs.writeFile(swaggerPath, YAML.stringify(document), (err) => {
     if (err) console.log(err)
   })
-  await app.startAllMicroservices()
+
+  Logger.log(`Writing ${swaggerPath} file... Done`)
+  //#endregion
+
   await app.listen(port)
 }
 
 bootstrap()
-

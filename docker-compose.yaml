@@ -5,9 +5,7 @@ services:
       context: .
       dockerfile: ./apps/users/Dockerfile
       target: development
-    command: npm run start:dev users
-    env_file:
-      - ./apps/users/.env
+    command: npm run start:debug users
     depends_on:
       - rabbitmq
       - mongodb-primary
@@ -17,7 +15,8 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - '3001:3001'
+      - 3001:3001
+      - 9229:9229
 
   auditors:
     container_name: auditors
@@ -25,9 +24,7 @@ services:
       context: .
       dockerfile: ./apps/auditors/Dockerfile
       target: development
-    command: npm run start:dev auditors
-    env_file:
-      - ./apps/auditors/.env
+    command: npm run start:debug auditors
     depends_on:
       - users
       - rabbitmq
@@ -38,7 +35,8 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - '3002:3002'
+      - 3002:3002
+      - 9230:9229
 
   projects:
     container_name: projects
@@ -46,9 +44,7 @@ services:
       context: .
       dockerfile: ./apps/projects/Dockerfile
       target: development
-    command: npm run start:dev projects
-    env_file:
-      - ./apps/projects/.env
+    command: npm run start:debug projects
     depends_on:
       - users
       - rabbitmq
@@ -59,7 +55,8 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - '3003:3003'
+      - 3003:3003
+      - 9231:9229
 
   rabbitmq:
     container_name: rabbitmq

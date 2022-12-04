@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Debug: Users",
+      "remoteRoot": "/usr/src/app",
+      "localRoot": "${workspaceFolder}",
+      "protocol": "inspector",
+      "port": 9229,
+      "restart": true,
+      "address": "0.0.0.0",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Debug: Auditors",
+      "remoteRoot": "/usr/src/app",
+      "localRoot": "${workspaceFolder}",
+      "protocol": "inspector",
+      "port": 9230,
+      "restart": true,
+      "address": "0.0.0.0",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Debug: Projects",
+      "remoteRoot": "/usr/src/app",
+      "localRoot": "${workspaceFolder}",
+      "protocol": "inspector",
+      "port": 9231,
+      "restart": true,
+      "address": "0.0.0.0",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+ }
