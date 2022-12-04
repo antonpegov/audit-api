@@ -9,6 +9,7 @@ import { LoginRequest } from '@users/dto/login.request'
 import { LoginResponse } from '@users/dto/login.response'
 import { LocalAuthGuard } from '@users/auth/auth-guards/local-auth.guard'
 import JwtAuthGuard from './auth-guards/jwt-auth.guard'
+import { sanitizeUser } from '@users/helpers/sanitize-user'
 
 const apiTag = 'auth'
 
@@ -24,7 +25,12 @@ export class AuthController {
     @Body() req: LoginRequest,
     @CurrentUser() user: User,
   ): Promise<LoginResponse> {
-    return this.authService.login(user)
+    return this.authService.login(user).then((data) => {
+      return {
+        token: data.token,
+        user: sanitizeUser(data.user),
+      }
+    })
   }
 
   @MessagePattern('validate_user')
@@ -39,4 +45,3 @@ export class AuthController {
     }
   }
 }
-

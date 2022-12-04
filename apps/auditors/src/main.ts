@@ -26,9 +26,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api')
   app.useGlobalPipes(new ValidationPipe())
   app.connectMicroservice(rmqService.getOptions('AUDITORS'))
-  Logger.log(`MongoDB connection string: ${configService.get<string>('MONGODB_URI')}`)
   Logger.log(`${configService.get<string>('RABBIT_MQ_AUDITORS_QUEUE')} quie activated`)
-  await app.startAllMicroservices()
 
   //#region Swagger
   const document = SwaggerModule.createDocument(app, config)
@@ -45,13 +43,14 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document)
   Logger.log(`Writing ${swaggerPath} file for ${apiURL}...`)
 
-  fs.writeFile('swagger-auditors.yaml', YAML.stringify(document), (err) => {
+  fs.writeFile(swaggerPath, YAML.stringify(document), (err) => {
     if (err) console.log(err)
   })
 
   Logger.log(`Writing ${swaggerPath} file... Done`)
   //#endregion
 
+  await app.startAllMicroservices()
   await app.listen(port)
 }
 

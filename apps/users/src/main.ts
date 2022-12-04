@@ -33,8 +33,6 @@ async function bootstrap() {
   app.connectMicroservice(rmqService.getOptions('AUTH'))
   Logger.log(`${configService.get<string>('RABBIT_MQ_USERS_QUEUE')} quie activated`)
   Logger.log(`${configService.get<string>('RABBIT_MQ_AUTH_QUEUE')} quie activated`)
-  Logger.log(`MongoDB connection string: ${configService.get<string>('MONGODB_URI')}`)
-  await app.startAllMicroservices()
 
   //#region Swagger
   const document = SwaggerModule.createDocument(app, config)
@@ -51,13 +49,14 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document)
   Logger.log(`Writing ${swaggerPath} file for ${apiURL}...`)
 
-  fs.writeFile('swagger-users.yaml', YAML.stringify(document), (err) => {
+  fs.writeFile(swaggerPath, YAML.stringify(document), (err) => {
     if (err) console.log(err)
   })
 
   Logger.log(`Writing ${swaggerPath} file... Done`)
   //#endregion
 
+  await app.startAllMicroservices()
   await app.listen(port)
 }
 

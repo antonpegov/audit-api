@@ -1,3 +1,6 @@
+import { lastValueFrom } from 'rxjs'
+import { ClientProxy } from '@nestjs/microservices'
+import * as bcrypt from 'bcrypt'
 import {
   Inject,
   Injectable,
@@ -5,15 +8,14 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common'
-import { lastValueFrom } from 'rxjs'
-import { ClientProxy } from '@nestjs/microservices'
-import * as bcrypt from 'bcrypt'
 
-import { User } from '@users/schemas/user.schema'
-import { CreateUserRequest } from '@users/dto/create-user.request'
+import { UserData } from '@users/dto/user-data.dto'
+import { sanitizeUser } from '@users/helpers/sanitize-user'
 import { UsersRepository } from '@users/users.repository'
-import { AUDITORS_SERVICE, PROJECTS_SERVICE } from '@users/constants/services'
+import { User, UserStatus } from '@users/schemas/user.schema'
+import { CreateUserRequest } from '@users/dto/create-user.request'
 import { PaginationOptions } from '@app/common'
+import { AUDITORS_SERVICE, PROJECTS_SERVICE } from '@users/constants/services'
 
 @Injectable()
 export class UsersService {
@@ -38,7 +40,7 @@ export class UsersService {
     }
   }
 
-  async createUser(request: CreateUserRequest): Promise<Omit<User, 'password'>> {
+  async createUser(request: CreateUserRequest): Promise<User> {
     let session, user
 
     await this.validateCreateUserRequest(request)
@@ -47,6 +49,7 @@ export class UsersService {
     try {
       user = await this.usersRepository.create({
         ...request,
+        status: UserStatus.NEW,
         password: await bcrypt.hash(request.password, 10),
       })
 
@@ -68,27 +71,17 @@ export class UsersService {
     }
   }
 
-  async getUsers(
-    paginationOptions: PaginationOptions,
-  ): Promise<Omit<User, 'password'>[]> {
+  async getUsers(paginationOptions: PaginationOptions): Promise<UserData[]> {
     return this.usersRepository
       .find({
         skip: (paginationOptions.page - 1) * paginationOptions.limit,
         take: paginationOptions.limit,
       })
-      .then((users) => {
-        users.forEach((user) => delete user.password)
-
-        return users
-      })
+      .then((users) => users.map(sanitizeUser))
   }
 
   async getUser(getUserArgs: Partial<User>): Promise<User> {
-    return this.usersRepository.findOne(getUserArgs).then((user) => {
-      // delete user.password
-
-      return user
-    })
+    return this.usersRepository.findOne(getUserArgs)
   }
 
   async validateUser(email: string, password: string) {
@@ -105,4 +98,3 @@ export class UsersService {
     this.logger.log(data)
   }
 }
-

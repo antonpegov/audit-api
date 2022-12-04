@@ -27,8 +27,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe())
   app.connectMicroservice(rmqService.getOptions('PROJECTS'))
   Logger.log(`${configService.get<string>('RABBIT_MQ_PROJECTS_QUEUE')} quie activated`)
-  Logger.log(`MongoDB connection string: ${configService.get<string>('MONGODB_URI')}`)
-  await app.startAllMicroservices()
 
   //#region Swagger
   const document = SwaggerModule.createDocument(app, config)
@@ -51,6 +49,7 @@ async function bootstrap() {
   Logger.log(`Writing ${swaggerPath} file... Done`)
   //#endregion
 
+  await app.startAllMicroservices()
   await app.listen(port)
 }
 

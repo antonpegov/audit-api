@@ -1,8 +1,7 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
 
-export class CreateUserRequest {
+export class UserData {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({ example: 'My Name' })
@@ -11,11 +10,10 @@ export class CreateUserRequest {
   @IsEmail()
   @IsNotEmpty()
   @ApiProperty({ example: 'my@email1.com' })
-  @Transform(({ value }) => value?.toLowerCase().trim())
   email: string
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ example: 'myPassword1' })
-  password: string
+  @ApiProperty({ example: 'Active' })
+  status: string
 }

@@ -1,6 +1,5 @@
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { EventPattern, Payload, Ctx, RmqContext } from '@nestjs/microservices'
-import { Types } from 'mongoose'
 import {
   Controller,
   Post,
@@ -12,8 +11,9 @@ import {
   ParseIntPipe,
 } from '@nestjs/common'
 
-import { User } from '@users/schemas/user.schema'
+import { UserData } from '@users/dto/user-data.dto'
 import { UsersService } from '@users/users.service'
+import { sanitizeUser } from '@users/helpers/sanitize-user'
 import { CreateUserRequest } from '@users/dto/create-user.request'
 import { infinityPagination, RmqService } from '@app/common'
 
@@ -27,17 +27,14 @@ export class UsersController {
 
   @Post()
   @ApiTags(apiTag)
-  @ApiCreatedResponse({
-    description: 'The record has been successfully created.',
-    type: User,
-  })
+  @ApiCreatedResponse({ type: UserData })
   create(@Body() request: CreateUserRequest) {
-    return this.usersService.createUser(request)
+    return this.usersService.createUser(request).then(sanitizeUser)
   }
 
   @Get()
   @ApiTags(apiTag)
-  @ApiOkResponse({ type: [User] })
+  @ApiOkResponse({ type: [UserData] })
   async findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
@@ -55,14 +52,11 @@ export class UsersController {
     )
   }
 
-  @Get(':id')
+  @Get(':email')
   @ApiTags(apiTag)
-  @ApiOkResponse({
-    description: 'The found record',
-    type: User,
-  })
-  findOne(@Param('id') id: string) {
-    return this.usersService.getUser({ _id: new Types.ObjectId(id) })
+  @ApiOkResponse({ type: UserData })
+  findOne(@Param('email') email: string) {
+    return this.usersService.getUser({ email }).then(sanitizeUser)
   }
 
   @EventPattern('project_created')
@@ -79,4 +73,3 @@ export class UsersController {
     this.rmqService.ack(context)
   }
 }
-
