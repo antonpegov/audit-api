@@ -8,9 +8,9 @@ services:
     command: npm run start:debug users
     depends_on:
       - rabbitmq
-      - mongodb-primary
-      - mongodb-secondary
-      - mongodb-arbiter
+      - debug-mongodb-primary
+      - debug-mongodb-secondary
+      - debug-mongodb-arbiter
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -28,9 +28,9 @@ services:
     depends_on:
       - users
       - rabbitmq
-      - mongodb-primary
-      - mongodb-secondary
-      - mongodb-arbiter
+      - debug-mongodb-primary
+      - debug-mongodb-secondary
+      - debug-mongodb-arbiter
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -48,9 +48,9 @@ services:
     depends_on:
       - users
       - rabbitmq
-      - mongodb-primary
-      - mongodb-secondary
-      - mongodb-arbiter
+      - debug-mongodb-primary
+      - debug-mongodb-secondary
+      - debug-mongodb-arbiter
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -78,11 +78,11 @@ services:
     ports:
       - '8080:80'
 
-  mongodb-primary:
-    container_name: mongodb-primary
+  debug-mongodb-primary:
+    container_name: debug-mongodb-primary
     image: docker.io/bitnami/mongodb:5.0
     environment:
-      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
+      - MONGODB_ADVERTISED_HOSTNAME=debug-mongodb-primary
       - MONGODB_REPLICA_SET_MODE=primary
       - MONGODB_ROOT_PASSWORD=password123
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
@@ -91,27 +91,27 @@ services:
     ports:
       - '27017:27017'
 
-  mongodb-secondary:
-    container_name: mongodb-secondary
+  debug-mongodb-secondary:
+    container_name: debug-mongodb-secondary
     image: docker.io/bitnami/mongodb:5.0
     depends_on:
-      - mongodb-primary
+      - debug-mongodb-primary
     environment:
-      - MONGODB_ADVERTISED_HOSTNAME=mongodb-secondary
+      - MONGODB_ADVERTISED_HOSTNAME=debug-mongodb-secondary
       - MONGODB_REPLICA_SET_MODE=secondary
-      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
+      - MONGODB_INITIAL_PRIMARY_HOST=debug-mongodb-primary
       - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
 
-  mongodb-arbiter:
-    container_name: mongodb-arbiter
+  debug-mongodb-arbiter:
+    container_name: debug-mongodb-arbiter
     image: docker.io/bitnami/mongodb:5.0
     depends_on:
-      - mongodb-primary
+      - debug-mongodb-primary
     environment:
-      - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
+      - MONGODB_ADVERTISED_HOSTNAME=debug-mongodb-arbiter
       - MONGODB_REPLICA_SET_MODE=arbiter
-      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
+      - MONGODB_INITIAL_PRIMARY_HOST=debug-mongodb-primary
       - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
 

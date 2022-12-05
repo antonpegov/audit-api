@@ -9,12 +9,20 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  Delete,
+  UseGuards,
+  Patch,
 } from '@nestjs/common'
 
+import { User } from '@users/schemas/user.schema'
 import { UserData } from '@users/dto/user-data.dto'
+import { Pagination } from '@users/dto/pagination'
+import { CurrentUser } from '@users/decorators/current-user.decorator'
 import { UsersService } from '@users/users.service'
 import { sanitizeUser } from '@users/helpers/sanitize-user'
+import { UpdateUserRequest } from '@users/dto/update-user.request'
 import { CreateUserRequest } from '@users/dto/create-user.request'
+import { sanitizeUpdateUserRequest } from '@users/helpers/sanitize-update-user-request'
 import { infinityPagination, RmqService } from '@app/common'
 
 const apiTag = 'users'
@@ -32,24 +40,37 @@ export class UsersController {
     return this.usersService.createUser(request).then(sanitizeUser)
   }
 
+  @Patch()
+  @ApiTags(apiTag)
+  @ApiOkResponse({ type: UserData })
+  // @UseGuards(JwtAuthGuard)
+  update(@Body() request: UpdateUserRequest, @CurrentUser() user: User) {
+    return this.usersService
+      .updateUser(user, sanitizeUpdateUserRequest(request))
+      .then(sanitizeUser)
+  }
+
+  @Delete()
+  @ApiTags(apiTag)
+  @ApiOkResponse({ type: Boolean })
+  // @UseGuards(JwtAuthGuard)
+  delete(@CurrentUser() user: User) {
+    return this.usersService.deleteUser(user)
+  }
+
   @Get()
   @ApiTags(apiTag)
-  @ApiOkResponse({ type: [UserData] })
+  @ApiOkResponse({ type: Pagination<UserData> })
   async findAll(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
   ) {
-    if (limit > 50) {
-      limit = 50
-    }
+    limit = limit > 50 ? 50 : limit
 
-    return infinityPagination(
-      await this.usersService.getUsers({
-        page,
-        limit,
-      }),
-      { page, limit },
-    )
+    return infinityPagination(await this.usersService.getUsers({ page, limit }), {
+      page,
+      limit,
+    })
   }
 
   @Get(':email')
@@ -60,14 +81,14 @@ export class UsersController {
   }
 
   @EventPattern('project_created')
-  async handleProjectCreated(@Payload() data: any, @Ctx() context: RmqContext) {
+  handleProjectCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     this.usersService.log(data)
     // remove the message from the queue
     this.rmqService.ack(context)
   }
 
   @EventPattern('user_created')
-  async handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
+  handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     this.usersService.log(data)
     // remove the message from the queue
     this.rmqService.ack(context)

@@ -16,6 +16,7 @@ import { User, UserStatus } from '@users/schemas/user.schema'
 import { CreateUserRequest } from '@users/dto/create-user.request'
 import { PaginationOptions } from '@app/common'
 import { AUDITORS_SERVICE, PROJECTS_SERVICE } from '@users/constants/services'
+import { UpdateUserRequest } from './dto/update-user.request'
 
 @Injectable()
 export class UsersService {
@@ -69,6 +70,19 @@ export class UsersService {
       await session.abortTransaction()
       throw err
     }
+  }
+
+  async updateUser(user: User, request: UpdateUserRequest): Promise<User> {
+    return this.usersRepository.findOneAndUpdate(user, {
+      ...request,
+      password: request.password
+        ? await bcrypt.hash(request.password, 10)
+        : user.password,
+    })
+  }
+
+  async deleteUser(user: User): Promise<true> {
+    return this.usersRepository.delete(user).then(() => true)
   }
 
   async getUsers(paginationOptions: PaginationOptions): Promise<UserData[]> {
