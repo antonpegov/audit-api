@@ -1,16 +1,16 @@
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices'
 import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common'
-import { RmqService } from '@app/common'
 import {
   ApiBearerAuth,
-  ApiCookieAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger'
 
 import { Project } from '@projects/schemas/project.schema'
+import { RmqService } from '@app/common'
 import { JwtAuthGuard } from '@projects/guards/jwt-auth.guard'
+import { CurrentUserId } from '@app/common/utils/'
 import { ProjectsService } from '@projects/projects.service'
 import { CreateProjectRequest } from '@projects/dto/create-project.request'
 
@@ -28,8 +28,8 @@ export class ProjectsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @ApiCreatedResponse({ type: Project })
-  create(@Body() request: CreateProjectRequest) {
-    return this.projectsService.createProject(request)
+  create(@Body() request: CreateProjectRequest, @CurrentUserId() userId: string) {
+    return this.projectsService.createProject(request, userId)
   }
 
   @Get()

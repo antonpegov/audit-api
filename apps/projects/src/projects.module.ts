@@ -3,16 +3,17 @@ import { ConfigModule } from '@nestjs/config'
 import { Module } from '@nestjs/common'
 import * as Joi from 'joi'
 
-import { ProjectsService } from '@projects/projects.service'
-import { ProjectsController } from '@projects/projects.controller'
-import { ProjectsRepository } from '@projects/projects.repository'
-import { Project, ProjectSchema } from '@projects/schemas/project.schema'
-import { DatabaseModule, RmqModule } from '@app/common'
 import {
   AUDITORS_SERVICE,
   AUTH_SERVICE,
   USERS_SERVICE,
 } from '@projects/constants/services'
+import { ProjectsService } from '@projects/projects.service'
+import { ProjectsController } from '@projects/projects.controller'
+import { ProjectsRepository } from '@projects/projects.repository'
+import { ProjectNameAvailable } from '@projects/validators/not-exists'
+import { Project, ProjectSchema } from '@projects/schemas/project.schema'
+import { DatabaseModule, RmqModule } from '@app/common'
 
 const envFilePath =
   process.env.NODE_ENV === 'production' ? './.env.projects' : './apps/projects/.env'
@@ -44,6 +45,7 @@ const envFilePath =
     MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
   ],
   controllers: [ProjectsController],
-  providers: [ProjectsService, ProjectsRepository],
+  providers: [ProjectsService, ProjectsRepository, ProjectNameAvailable],
 })
 export class ProjectsModule {}
+

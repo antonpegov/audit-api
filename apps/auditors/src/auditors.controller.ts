@@ -1,16 +1,14 @@
 import { Controller, Post, Body, Get, UseGuards, Req, Logger } from '@nestjs/common'
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices'
-import { RmqService } from '@app/common'
 import {
   ApiBearerAuth,
-  ApiCookieAuth,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiOperation,
   ApiTags,
 } from '@nestjs/swagger'
 
 import { Auditor } from '@auditors/schemas/auditor.schema'
+import { RmqService } from '@app/common'
 import { JwtAuthGuard } from '@auditors/guards/jwt-auth.guard'
 import { CreateAuditor } from '@auditors/dto/create-auditor.dto'
 import { AuditorsService } from '@auditors/auditors.service'

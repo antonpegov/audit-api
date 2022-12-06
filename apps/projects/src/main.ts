@@ -1,5 +1,6 @@
+import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
-import { Logger, ValidationPipe } from '@nestjs/common'
+import { useContainer, ValidationError } from 'class-validator'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import * as YAML from 'json-to-pretty-yaml'
@@ -24,8 +25,15 @@ async function bootstrap() {
 
   app.enableCors()
   app.setGlobalPrefix('api')
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
+        return new BadRequestException(validationErrors)
+      },
+    }),
+  )
   app.connectMicroservice(rmqService.getOptions('PROJECTS'))
+  useContainer(app.select(ProjectsModule), { fallbackOnErrors: true })
   Logger.log(`${configService.get<string>('RABBIT_MQ_PROJECTS_QUEUE')} quie activated`)
 
   //#region Swagger
@@ -54,3 +62,4 @@ async function bootstrap() {
 }
 
 bootstrap()
+

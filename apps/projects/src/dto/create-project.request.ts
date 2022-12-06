@@ -1,24 +1,30 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
+import { IsNotEmpty, IsString, Validate } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
-import { Transform } from 'class-transformer'
+
+import { UserHasNoProjects } from '@projects/validators/user-has-no-projects'
+import { ProjectNameAvailable } from '@projects/validators/not-exists'
 
 export class CreateProjectRequest {
-  @ApiProperty({ example: 'My Name' })
   @IsString()
   @IsNotEmpty()
+  @Validate(ProjectNameAvailable)
+  @ApiProperty({ example: 'My Project1' })
   name: string
 
-  @ApiProperty({ example: 'test1@example.com' })
-  @Transform(({ value }) => value?.toLowerCase().trim())
   @IsNotEmpty()
-  // @Validate(IsNotExist, ['Project'], {
-  //   message: 'emailAlreadyExists',
-  // })
-  @IsEmail()
-  email: string
+  @ApiProperty({ example: 'Some Description' })
+  description: string
 
-  @ApiProperty({ example: 'myPass1' })
   @IsNotEmpty()
-  password: string
+  @ApiProperty({ example: 'https://my.github.com' })
+  gitUrl: string
+
+  @IsNotEmpty()
+  @ApiProperty({ example: '{"Cats": "My cat`s photos", "Dog": "My dog`s photos"}' })
+  gitFolders: Record<string, string>
+
+  @IsNotEmpty()
+  @ApiProperty({ example: '["bitcoin", "privacy"]' })
+  tags: string[]
 }
 

@@ -1,14 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsArray, IsBoolean, IsNotEmpty } from 'class-validator'
+import { IsNotEmpty } from 'class-validator'
 
 export class Pagination<T> {
-  @IsArray()
   @IsNotEmpty()
   @ApiProperty({ example: [] })
   data: T[]
 
-  @IsBoolean()
   @IsNotEmpty()
   @ApiProperty({ example: true })
   hasNextPage: boolean
+
+  @IsNotEmpty()
+  @ApiProperty({ example: 1 })
+  page: number
+
+  @IsNotEmpty()
+  @ApiProperty({ example: 10 })
+  limit: number
 }
+

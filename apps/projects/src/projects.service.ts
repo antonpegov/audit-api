@@ -1,10 +1,10 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common'
 import { lastValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
 
 import { Project } from '@projects/schemas/project.schema'
-import { CreateProjectRequest } from '@projects/dto/create-project.request'
 import { ProjectsRepository } from '@projects/projects.repository'
+import { CreateProjectRequest } from '@projects/dto/create-project.request'
 import { AUDITORS_SERVICE, USERS_SERVICE } from '@projects/constants/services'
 
 @Injectable()
@@ -17,11 +17,19 @@ export class ProjectsService {
     @Inject(AUDITORS_SERVICE) private auditorsClient: ClientProxy,
   ) {}
 
-  async createProject(request: CreateProjectRequest): Promise<Omit<Project, 'password'>> {
+  async createProject(request: CreateProjectRequest, ownerId: string): Promise<Project> {
+    if (await this.projectsRepository.findOne({ ownerId })) {
+      throw new BadRequestException('User already has a project')
+    }
+
     const session = await this.projectsRepository.startTransaction()
+    Logger.log('Creating project for user with id = ' + ownerId)
 
     try {
-      const project = await this.projectsRepository.create(request, { session })
+      const project = await this.projectsRepository.create(
+        { ...request, startDate: new Date(), ownerId },
+        { session },
+      )
 
       await lastValueFrom(
         this.auditorsClient.emit('project_created', {
@@ -33,8 +41,9 @@ export class ProjectsService {
           request,
         }),
       )
-      this.logger.log(`'project_created' emitted`)
+
       await session.commitTransaction()
+
       return project
     } catch (err) {
       await session.abortTransaction()
@@ -43,11 +52,7 @@ export class ProjectsService {
   }
 
   getProjects(): Promise<Project[]> {
-    return this.projectsRepository.find({}).then((projects) => {
-      projects.forEach((project) => delete project.password)
-
-      return projects
-    })
+    return this.projectsRepository.find({})
   }
 
   greetService(data: any) {

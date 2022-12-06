@@ -11,6 +11,7 @@
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug 0.0.0.0:9229 --watch",
     "publish": "set VERSION=0.0.1 && env-cmd ./publish-partial",
     "publish:dev": "set VERSION=DEV && env-cmd ./publish-docker",
     "publish:test": "set VERSION=TEST && env-cmd ./publish-docker",
@@ -101,3 +102,4 @@
     }
   }
 }
+

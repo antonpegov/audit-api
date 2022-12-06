@@ -85,11 +85,11 @@ export class UsersService {
     return this.usersRepository.delete(user).then(() => true)
   }
 
-  async getUsers(paginationOptions: PaginationOptions): Promise<UserData[]> {
+  async getUsers(options: PaginationOptions): Promise<UserData[]> {
     return this.usersRepository
       .find({
-        skip: (paginationOptions.page - 1) * paginationOptions.limit,
-        take: paginationOptions.limit,
+        skip: (options.page - 1) * options.limit,
+        take: options.limit,
       })
       .then((users) => users.map(sanitizeUser))
   }
@@ -112,3 +112,4 @@ export class UsersService {
     this.logger.log(data)
   }
 }
+
