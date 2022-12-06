@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common'
 import * as Joi from 'joi'
 
 import { UsersService } from '@users/users.service'
+import { EmailAvailable } from '@users/validators/email-available'
 import { UsersRepository } from '@users/users.repository'
 import { UsersController } from '@users/users.controller'
 import { AUDITORS_SERVICE } from '@users/constants/services'
@@ -38,7 +39,7 @@ const envFilePath =
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepository],
+  providers: [UsersService, UsersRepository, EmailAvailable],
   exports: [UsersService],
 })
 export class UsersModule {}

@@ -9,8 +9,20 @@ export enum UserStatus {
   BANNED = 'banned',
 }
 
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+}
+
+export enum UserAccountType {
+  PROJECT = 'project',
+  AUDITOR = 'auditor',
+}
+
 @Schema({ versionKey: false })
 export class User extends AbstractDocument {
+  // Provided by user
+
   @Prop({ required: true })
   name: string
 
@@ -21,7 +33,22 @@ export class User extends AbstractDocument {
   password: string
 
   @Prop({ required: true })
+  requestedAccountType: UserAccountType
+
+  // Provided by system
+
+  @Prop({ required: true })
   status: UserStatus
+
+  @Prop({ required: true })
+  role: UserRole
+
+  @Prop({ required: true })
+  createdAt: Date
+
+  @Prop({ required: true })
+  updatedAt: Date
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)
+

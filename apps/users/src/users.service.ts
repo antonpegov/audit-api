@@ -12,11 +12,11 @@ import {
 import { UserData } from '@users/dto/user-data.dto'
 import { sanitizeUser } from '@users/helpers/sanitize-user'
 import { UsersRepository } from '@users/users.repository'
-import { User, UserStatus } from '@users/schemas/user.schema'
 import { CreateUserRequest } from '@users/dto/create-user.request'
 import { PaginationOptions } from '@app/common'
+import { UpdateUserRequest } from '@users/dto/update-user.request'
+import { User, UserRole, UserStatus } from '@users/schemas/user.schema'
 import { AUDITORS_SERVICE, PROJECTS_SERVICE } from '@users/constants/services'
-import { UpdateUserRequest } from './dto/update-user.request'
 
 @Injectable()
 export class UsersService {
@@ -28,28 +28,17 @@ export class UsersService {
     @Inject(AUDITORS_SERVICE) private auditorsClient: ClientProxy,
   ) {}
 
-  private async validateCreateUserRequest(request: CreateUserRequest) {
-    let user: User
-    try {
-      user = await this.usersRepository.findOne({
-        email: request.email,
-      })
-    } catch (err) {}
-
-    if (user) {
-      throw new UnprocessableEntityException('Email already exists.')
-    }
-  }
-
   async createUser(request: CreateUserRequest): Promise<User> {
     let session, user
 
-    await this.validateCreateUserRequest(request)
     session = await this.usersRepository.startTransaction()
 
     try {
       user = await this.usersRepository.create({
         ...request,
+        role: UserRole.USER,
+        createdAt: new Date(),
+        updatedAt: new Date(),
         status: UserStatus.NEW,
         password: await bcrypt.hash(request.password, 10),
       })
@@ -75,6 +64,7 @@ export class UsersService {
   async updateUser(user: User, request: UpdateUserRequest): Promise<User> {
     return this.usersRepository.findOneAndUpdate(user, {
       ...request,
+      updatedAt: new Date(),
       password: request.password
         ? await bcrypt.hash(request.password, 10)
         : user.password,

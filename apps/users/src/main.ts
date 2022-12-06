@@ -5,7 +5,7 @@ import { NestFactory } from '@nestjs/core'
 import * as YAML from 'json-to-pretty-yaml'
 import * as fs from 'fs'
 
-import { RmqService } from '@app/common'
+import { RmqService, validationConfigurator } from '@app/common'
 import { AuthModule } from '@users/auth/auth.module'
 
 async function bootstrap() {
@@ -28,7 +28,7 @@ async function bootstrap() {
 
   app.enableCors()
   app.setGlobalPrefix('api')
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe(validationConfigurator))
   app.connectMicroservice(rmqService.getOptions('USERS'))
   app.connectMicroservice(rmqService.getOptions('AUTH'))
   Logger.log(`${configService.get<string>('RABBIT_MQ_USERS_QUEUE')} quie activated`)
@@ -61,3 +61,4 @@ async function bootstrap() {
 }
 
 bootstrap()
+
