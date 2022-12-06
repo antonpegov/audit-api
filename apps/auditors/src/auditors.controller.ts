@@ -9,8 +9,10 @@ import {
 
 import { Auditor } from '@auditors/schemas/auditor.schema'
 import { RmqService } from '@app/common'
+import { AuditorData } from '@auditors/dto/auditor.data'
 import { JwtAuthGuard } from '@auditors/guards/jwt-auth.guard'
-import { CreateAuditor } from '@auditors/dto/create-auditor.dto'
+import { CurrentUserId } from '@app/common/utils/'
+import { CreateAuditorRequest } from '@auditors/dto/create-auditor.request'
 import { AuditorsService } from '@auditors/auditors.service'
 
 const apiTag = 'auditors'
@@ -26,16 +28,14 @@ export class AuditorsController {
   @ApiTags(apiTag)
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @ApiCreatedResponse({ type: Auditor })
-  create(@Body() request: CreateAuditor, @Req() req: any) {
-    Logger.log('request: ' + JSON.stringify(request))
-
-    return this.auditorsService.createAuditor(request)
+  @ApiCreatedResponse({ type: AuditorData })
+  create(@Body() request: CreateAuditorRequest, @CurrentUserId() userId: string) {
+    return this.auditorsService.createAuditor(request, userId)
   }
 
   @Get()
   @ApiTags(apiTag)
-  @ApiOkResponse({ type: [Auditor] })
+  @ApiOkResponse({ type: [AuditorData] })
   find() {
     return this.auditorsService.getAuditors()
   }

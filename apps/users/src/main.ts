@@ -7,6 +7,8 @@ import * as fs from 'fs'
 
 import { RmqService, validationConfigurator } from '@app/common'
 import { AuthModule } from '@users/auth/auth.module'
+import { useContainer } from 'class-validator'
+import { UsersModule } from './users.module'
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule)
@@ -28,9 +30,10 @@ async function bootstrap() {
 
   app.enableCors()
   app.setGlobalPrefix('api')
-  app.useGlobalPipes(new ValidationPipe(validationConfigurator))
-  app.connectMicroservice(rmqService.getOptions('USERS'))
   app.connectMicroservice(rmqService.getOptions('AUTH'))
+  app.connectMicroservice(rmqService.getOptions('USERS'))
+  app.useGlobalPipes(new ValidationPipe(validationConfigurator))
+  useContainer(app.select(UsersModule), { fallbackOnErrors: true })
   Logger.log(`${configService.get<string>('RABBIT_MQ_USERS_QUEUE')} quie activated`)
   Logger.log(`${configService.get<string>('RABBIT_MQ_AUTH_QUEUE')} quie activated`)
 

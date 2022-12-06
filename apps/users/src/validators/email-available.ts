@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
@@ -12,9 +12,9 @@ import { UsersRepository } from '@users/users.repository'
 export class EmailAvailable implements ValidatorConstraintInterface {
   constructor(private usersRepository: UsersRepository) {}
 
-  async validate(name: string) {
+  async validate(email: string) {
     try {
-      const user = await this.usersRepository.findOne({ name })
+      const user = await this.usersRepository.findOneOrReturnNull({ email })
 
       return !user
     } catch (e) {

@@ -1,9 +1,9 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common'
 import { lastValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
 
 import { Auditor } from '@auditors/schemas/auditor.schema'
-import { CreateAuditor } from '@auditors/dto/create-auditor.dto'
+import { CreateAuditorRequest } from '@auditors/dto/create-auditor.request'
 import { AuditorsRepository } from '@auditors/auditors.repository'
 import { PROJECTS_SERVICE, USERS_SERVICE } from '@auditors/constants/services'
 
@@ -17,11 +17,18 @@ export class AuditorsService {
     @Inject(PROJECTS_SERVICE) private projectsClient: ClientProxy,
   ) {}
 
-  async createAuditor(request: CreateAuditor): Promise<Omit<Auditor, 'password'>> {
+  async createAuditor(request: CreateAuditorRequest, ownerId: string): Promise<Auditor> {
+    if (await this.auditorsRepository.findOneOrReturnNull({ ownerId })) {
+      throw new BadRequestException('You already have an auditor account')
+    }
+
     const session = await this.auditorsRepository.startTransaction()
 
     try {
-      const auditor = await this.auditorsRepository.create(request, { session })
+      const auditor = await this.auditorsRepository.create(
+        { ...request, registerDate: new Date(), ownerId },
+        { session },
+      )
 
       await lastValueFrom(
         this.projectsClient.emit('auditor_created', {
@@ -43,11 +50,7 @@ export class AuditorsService {
   }
 
   getAuditors(): Promise<Auditor[]> {
-    return this.auditorsRepository.find({}).then((auditors) => {
-      auditors.forEach((auditor) => delete auditor.password)
-
-      return auditors
-    })
+    return this.auditorsRepository.find({})
   }
 
   greetService(data: any) {

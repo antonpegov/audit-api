@@ -13,9 +13,9 @@ export class CreateUserRequest {
 
   @IsEmail()
   @IsNotEmpty()
+  @Validate(EmailAvailable)
   @ApiProperty({ example: 'my@email1.com' })
   @Transform(({ value }) => value?.toLowerCase().trim())
-  @Validate(EmailAvailable)
   email: string
 
   @IsString()

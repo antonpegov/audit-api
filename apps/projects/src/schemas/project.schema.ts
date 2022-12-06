@@ -22,11 +22,12 @@ export class Project extends AbstractDocument {
   tags: string[]
 
   // Automatically added fields:
+
   @Prop({ required: true })
   ownerId: string
 
   @Prop({ required: true })
-  startDate: Date
+  registerDate: Date
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project)

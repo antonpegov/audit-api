@@ -10,6 +10,8 @@ import { UsersService } from '@users/users.service'
 import { LocalStrategy } from '@users/auth/auth-strategies/local.strategy'
 import { AuthController } from '@users/auth/auth.controller'
 import { UsersModule } from '@users/users.module'
+import { EmailAvailable } from '@users/validators/email-available'
+import { UsersRepository } from '@users/users.repository'
 
 @Module({
   imports: [

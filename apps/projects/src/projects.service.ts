@@ -19,15 +19,14 @@ export class ProjectsService {
 
   async createProject(request: CreateProjectRequest, ownerId: string): Promise<Project> {
     if (await this.projectsRepository.findOneOrReturnNull({ ownerId })) {
-      throw new BadRequestException('You already have a project')
+      throw new BadRequestException('You already have a project account')
     }
 
     const session = await this.projectsRepository.startTransaction()
-    Logger.log('Creating project for user with id = ' + ownerId)
 
     try {
       const project = await this.projectsRepository.create(
-        { ...request, startDate: new Date(), ownerId },
+        { ...request, registerDate: new Date(), ownerId },
         { session },
       )
 

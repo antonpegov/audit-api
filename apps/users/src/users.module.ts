@@ -40,6 +40,7 @@ const envFilePath =
   ],
   controllers: [UsersController],
   providers: [UsersService, UsersRepository, EmailAvailable],
-  exports: [UsersService],
+  exports: [UsersService, EmailAvailable],
 })
 export class UsersModule {}
+

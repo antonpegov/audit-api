@@ -9,6 +9,7 @@ import {
 
 import { Project } from '@projects/schemas/project.schema'
 import { RmqService } from '@app/common'
+import { ProjectData } from '@projects/dto/project.data'
 import { JwtAuthGuard } from '@projects/guards/jwt-auth.guard'
 import { CurrentUserId } from '@app/common/utils/'
 import { ProjectsService } from '@projects/projects.service'
@@ -27,14 +28,14 @@ export class ProjectsController {
   @ApiTags(apiTag)
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @ApiCreatedResponse({ type: Project })
+  @ApiCreatedResponse({ type: ProjectData })
   create(@Body() request: CreateProjectRequest, @CurrentUserId() userId: string) {
     return this.projectsService.createProject(request, userId)
   }
 
   @Get()
   @ApiTags(apiTag)
-  @ApiOkResponse({ type: [Project] })
+  @ApiOkResponse({ type: [ProjectData] })
   find() {
     return this.projectsService.getProjects()
   }

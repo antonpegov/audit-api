@@ -17,3 +17,4 @@ export class UserData {
   @ApiProperty({ example: 'Active' })
   status: string
 }
+
