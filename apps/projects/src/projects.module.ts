@@ -11,7 +11,7 @@ import {
 import { ProjectsService } from '@projects/projects.service'
 import { ProjectsController } from '@projects/projects.controller'
 import { ProjectsRepository } from '@projects/projects.repository'
-import { ProjectNameAvailable } from '@projects/validators/not-exists'
+import { ProjectNameAvailable } from '@projects/validators/project-name-available'
 import { Project, ProjectSchema } from '@projects/schemas/project.schema'
 import { DatabaseModule, RmqModule } from '@app/common'
 

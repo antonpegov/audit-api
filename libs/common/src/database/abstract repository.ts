@@ -23,6 +23,16 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     return (await createdDocument.save(options)).toJSON() as unknown as TDocument
   }
 
+  async findOneOrReturnNull(filterQuery: FilterQuery<TDocument>): Promise<TDocument> {
+    const document = await this.model.findOne(filterQuery, {}, { lean: true })
+
+    if (!document) {
+      return null
+    }
+
+    return document
+  }
+
   async findOne(filterQuery: FilterQuery<TDocument>): Promise<TDocument> {
     const document = await this.model.findOne(filterQuery, {}, { lean: true })
 
@@ -73,3 +83,4 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     return session
   }
 }
+

@@ -1,8 +1,7 @@
 import { IsNotEmpty, IsString, Validate } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
-import { UserHasNoProjects } from '@projects/validators/user-has-no-projects'
-import { ProjectNameAvailable } from '@projects/validators/not-exists'
+import { ProjectNameAvailable } from '@projects/validators/project-name-available'
 
 export class CreateProjectRequest {
   @IsString()

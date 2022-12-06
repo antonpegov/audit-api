@@ -8,6 +8,7 @@ import * as fs from 'fs'
 
 import { RmqService } from '@app/common'
 import { ProjectsModule } from '@projects/projects.module'
+import { validationConfigurator } from '@app/common/utils/validation'
 
 async function bootstrap() {
   const app = await NestFactory.create(ProjectsModule)
@@ -25,13 +26,7 @@ async function bootstrap() {
 
   app.enableCors()
   app.setGlobalPrefix('api')
-  app.useGlobalPipes(
-    new ValidationPipe({
-      exceptionFactory: (validationErrors: ValidationError[] = []) => {
-        return new BadRequestException(validationErrors)
-      },
-    }),
-  )
+  app.useGlobalPipes(new ValidationPipe(validationConfigurator))
   app.connectMicroservice(rmqService.getOptions('PROJECTS'))
   useContainer(app.select(ProjectsModule), { fallbackOnErrors: true })
   Logger.log(`${configService.get<string>('RABBIT_MQ_PROJECTS_QUEUE')} quie activated`)

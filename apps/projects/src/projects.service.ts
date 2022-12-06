@@ -18,8 +18,8 @@ export class ProjectsService {
   ) {}
 
   async createProject(request: CreateProjectRequest, ownerId: string): Promise<Project> {
-    if (await this.projectsRepository.findOne({ ownerId })) {
-      throw new BadRequestException('User already has a project')
+    if (await this.projectsRepository.findOneOrReturnNull({ ownerId })) {
+      throw new BadRequestException('You already have a project')
     }
 
     const session = await this.projectsRepository.startTransaction()

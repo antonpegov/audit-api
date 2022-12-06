@@ -59,5 +59,6 @@ ENV NODE_ENV=${NODE_ENV}
 COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY --from=build /usr/src/app/dist ./dist
 
+
 # Start the server using the production build
 CMD [ "node", "./dist/apps/projects/main" ]
