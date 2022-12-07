@@ -15,7 +15,7 @@ export enum UserRole {
 }
 
 export enum UserAccountType {
-  PROJECT = 'project',
+  CLIENT = 'client',
   AUDITOR = 'auditor',
 }
 

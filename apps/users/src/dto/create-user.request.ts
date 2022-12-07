@@ -24,8 +24,8 @@ export class CreateUserRequest {
   password: string
 
   @IsString()
-  @Matches(`^(project|auditor)$`)
-  @ApiProperty({ example: 'project' })
+  @Matches(`^(client|auditor)$`)
+  @ApiProperty({ example: 'auditor' })
   requestedAccountType: UserAccountType
 }
 
