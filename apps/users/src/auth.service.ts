@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
-import { Response } from 'express'
+import { Types } from 'mongoose'
+
 import { User } from '@users/schemas/user.schema'
 
 export interface TokenPayload {
@@ -41,15 +42,8 @@ export class AuthService {
     }
   }
 
-  logout(response: Response) {
-    response.cookie('Authentication', '', {
-      httpOnly: true,
-      expires: new Date(),
-    })
-  }
-
   validateToken(jwt: string) {
-    return this.jwtService.verify(jwt)
+    return this.jwtService.verify<{ userId }>(jwt)
   }
 }
 

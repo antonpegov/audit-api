@@ -1,4 +1,3 @@
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger'
 import { EventPattern, Payload, Ctx, RmqContext } from '@nestjs/microservices'
 import {
   Controller,
@@ -13,17 +12,23 @@ import {
   UseGuards,
   Patch,
 } from '@nestjs/common'
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger'
 
-import { User } from '@users/schemas/user.schema'
 import { UserData } from '@users/dto/user-data.dto'
 import { Pagination } from '@users/dto/pagination'
 import { CurrentUser } from '@users/decorators/current-user.decorator'
 import { UsersService } from '@users/users.service'
 import { sanitizeUser } from '@users/helpers/sanitize-user'
+import { JwtAuthGuard } from '@users/guards/jwt-auth.guard'
 import { UpdateUserRequest } from '@users/dto/update-user.request'
 import { CreateUserRequest } from '@users/dto/create-user.request'
 import { sanitizeUpdateUserRequest } from '@users/helpers/sanitize-update-user-request'
-import { infinityPagination, RmqService } from '@app/common'
+import { infinityPagination, RmqService, UserId } from '@app/common'
 
 const apiTag = 'users'
 @Controller(apiTag)
@@ -42,20 +47,22 @@ export class UsersController {
 
   @Patch()
   @ApiTags(apiTag)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: UserData })
-  // @UseGuards(JwtAuthGuard)
-  update(@Body() request: UpdateUserRequest, @CurrentUser() user: User) {
+  @UseGuards(JwtAuthGuard)
+  update(@Body() request: UpdateUserRequest, @CurrentUser() userId: UserId) {
     return this.usersService
-      .updateUser(user, sanitizeUpdateUserRequest(request))
+      .updateUser(userId, sanitizeUpdateUserRequest(request))
       .then(sanitizeUser)
   }
 
   @Delete()
   @ApiTags(apiTag)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: Boolean })
-  // @UseGuards(JwtAuthGuard)
-  delete(@CurrentUser() user: User) {
-    return this.usersService.deleteUser(user)
+  @UseGuards(JwtAuthGuard)
+  delete(@CurrentUser() userId: UserId) {
+    return this.usersService.deleteUser(userId)
   }
 
   @Get()
@@ -87,6 +94,13 @@ export class UsersController {
     this.rmqService.ack(context)
   }
 
+  @EventPattern('customer_created')
+  handleustomerCreated(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.usersService.log(data)
+    // remove the message from the queue
+    this.rmqService.ack(context)
+  }
+
   @EventPattern('user_created')
   handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     this.usersService.log(data)
@@ -94,3 +108,4 @@ export class UsersController {
     this.rmqService.ack(context)
   }
 }
+

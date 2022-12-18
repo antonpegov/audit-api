@@ -18,7 +18,7 @@ async function bootstrap() {
   const port = configService.get('PORT')
   const config = new DocumentBuilder()
     .addBearerAuth()
-    .setTitle('Projects')
+    .setTitle('Projects/Customers')
     .setDescription('Projects API')
     .setVersion('0.1')
     .addTag('projects')

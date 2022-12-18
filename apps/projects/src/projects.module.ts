@@ -9,10 +9,14 @@ import {
   USERS_SERVICE,
 } from '@projects/constants/services'
 import { ProjectsService } from '@projects/projects.service'
+import { CustomersService } from '@projects/customers.service'
 import { ProjectsController } from '@projects/projects.controller'
 import { ProjectsRepository } from '@projects/projects.repository'
+import { CustomersRepository } from '@projects/customers.repository'
+import { CustomersController } from '@projects/customers.controller'
 import { ProjectNameAvailable } from '@projects/validators/project-name-available'
 import { Project, ProjectSchema } from '@projects/schemas/project.schema'
+import { Customer, CustomerSchema } from '@projects/schemas/customer.schema'
 import { DatabaseModule, RmqModule } from '@app/common'
 
 const envFilePath =
@@ -42,10 +46,19 @@ const envFilePath =
       }),
       envFilePath,
     }),
-    MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
+    MongooseModule.forFeature([
+      { name: Project.name, schema: ProjectSchema },
+      { name: Customer.name, schema: CustomerSchema },
+    ]),
   ],
-  controllers: [ProjectsController],
-  providers: [ProjectsService, ProjectsRepository, ProjectNameAvailable],
+  controllers: [ProjectsController, CustomersController],
+  providers: [
+    CustomersService,
+    CustomersRepository,
+    ProjectsService,
+    ProjectsRepository,
+    ProjectNameAvailable,
+  ],
 })
 export class ProjectsModule {}
 

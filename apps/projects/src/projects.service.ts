@@ -17,16 +17,15 @@ export class ProjectsService {
     @Inject(AUDITORS_SERVICE) private auditorsClient: ClientProxy,
   ) {}
 
-  async createProject(request: CreateProjectRequest, ownerId: string): Promise<Project> {
-    if (await this.projectsRepository.findOneOrReturnNull({ ownerId })) {
-      throw new BadRequestException('You already have a project account')
-    }
-
+  async createProject(
+    request: CreateProjectRequest,
+    customerId: string,
+  ): Promise<Project> {
     const session = await this.projectsRepository.startTransaction()
 
     try {
       const project = await this.projectsRepository.create(
-        { ...request, registerDate: new Date(), ownerId },
+        { ...request, createdAt: new Date(), updatedAt: new Date(), customerId },
         { session },
       )
 
@@ -35,6 +34,7 @@ export class ProjectsService {
           request,
         }),
       )
+
       await lastValueFrom(
         this.usersClient.emit('project_created', {
           request,

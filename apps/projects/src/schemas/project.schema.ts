@@ -21,13 +21,16 @@ export class Project extends AbstractDocument {
   @Prop({ required: true })
   tags: string[]
 
+  @Prop({ required: true })
+  customerId: string
+
   // Automatically added fields:
 
   @Prop({ required: true })
-  ownerId: string
+  createdAt: Date
 
   @Prop({ required: true })
-  registerDate: Date
+  updatedAt: Date
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project)

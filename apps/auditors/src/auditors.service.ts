@@ -3,8 +3,8 @@ import { lastValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
 
 import { Auditor } from '@auditors/schemas/auditor.schema'
-import { CreateAuditorRequest } from '@auditors/dto/create-auditor.request'
 import { AuditorsRepository } from '@auditors/auditors.repository'
+import { CreateAuditorRequest } from '@auditors/dto/create-auditor.request'
 import { PROJECTS_SERVICE, USERS_SERVICE } from '@auditors/constants/services'
 
 @Injectable()

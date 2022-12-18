@@ -5,4 +5,5 @@ export * from './rmq/rmq.module'
 export * from './rmq/rmq.service'
 export * from './utils/decorators'
 export * from './utils'
+export * from './models'
 

@@ -47,6 +47,13 @@ export class AuditorsController {
     this.rmqService.ack(context)
   }
 
+  @EventPattern('customer_created')
+  handleustomerCreated(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.auditorsService.greetService(data)
+    // remove the message from the queue
+    this.rmqService.ack(context)
+  }
+
   @EventPattern('user_created')
   async handleUserCreated(@Payload() data: any, @Ctx() context: RmqContext) {
     this.auditorsService.greetService(data)

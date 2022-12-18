@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { ConfigService } from '@nestjs/config'
 import { Types } from 'mongoose'
 
-import { TokenPayload } from '@users/auth/auth.service'
+import { TokenPayload } from '@users/auth.service'
 import { UsersService } from '@users/users.service'
 
 @Injectable()

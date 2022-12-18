@@ -7,7 +7,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 
-import { Project } from '@projects/schemas/project.schema'
 import { RmqService } from '@app/common'
 import { ProjectData } from '@projects/dto/project.data'
 import { JwtAuthGuard } from '@projects/guards/jwt-auth.guard'

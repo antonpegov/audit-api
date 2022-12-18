@@ -1,22 +1,17 @@
 import { lastValueFrom } from 'rxjs'
 import { ClientProxy } from '@nestjs/microservices'
 import * as bcrypt from 'bcrypt'
-import {
-  Inject,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-  UnprocessableEntityException,
-} from '@nestjs/common'
+import { Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common'
 
 import { UserData } from '@users/dto/user-data.dto'
 import { sanitizeUser } from '@users/helpers/sanitize-user'
 import { UsersRepository } from '@users/users.repository'
 import { CreateUserRequest } from '@users/dto/create-user.request'
-import { PaginationOptions } from '@app/common'
+import { PaginationOptions, UserId } from '@app/common'
 import { UpdateUserRequest } from '@users/dto/update-user.request'
 import { User, UserRole, UserStatus } from '@users/schemas/user.schema'
 import { AUDITORS_SERVICE, PROJECTS_SERVICE } from '@users/constants/services'
+import { FilterQuery } from 'mongoose'
 
 @Injectable()
 export class UsersService {
@@ -61,18 +56,21 @@ export class UsersService {
     }
   }
 
-  async updateUser(user: User, request: UpdateUserRequest): Promise<User> {
-    return this.usersRepository.findOneAndUpdate(user, {
-      ...request,
-      updatedAt: new Date(),
-      password: request.password
-        ? await bcrypt.hash(request.password, 10)
-        : user.password,
-    })
+  async updateUser(userId: UserId, request: UpdateUserRequest): Promise<User> {
+    return this.usersRepository.findOneAndUpdate(
+      { _id: userId },
+      {
+        ...request,
+        updatedAt: new Date(),
+        // password: request.password
+        //   ? await bcrypt.hash(request.password, 10)
+        //   : user.password,
+      },
+    )
   }
 
-  async deleteUser(user: User): Promise<true> {
-    return this.usersRepository.delete(user).then(() => true)
+  async deleteUser(userId: UserId): Promise<true> {
+    return this.usersRepository.delete({ _id: userId }).then(() => true)
   }
 
   async getUsers(options: PaginationOptions): Promise<UserData[]> {
@@ -84,18 +82,24 @@ export class UsersService {
       .then((users) => users.map(sanitizeUser))
   }
 
-  async getUser(getUserArgs: Partial<User>): Promise<User> {
+  async getUser(getUserArgs: FilterQuery<User>): Promise<User> {
     return this.usersRepository.findOne(getUserArgs)
   }
 
   async validateUser(email: string, password: string) {
-    const user = await this.usersRepository.findOne({ email })
-    const passwordIsValid = await bcrypt.compare(password, user.password)
+    try {
+      const user = await this.usersRepository.findOneOrReturnNull({ email })
 
-    if (!passwordIsValid) {
-      throw new UnauthorizedException('Credentials are not valid.')
+      if (!user) throw 'Credentials are not valid'
+
+      const passwordIsValid = await bcrypt.compare(password, user.password)
+
+      if (!passwordIsValid) throw 'Credentials are not valid'
+
+      return user
+    } catch (e) {
+      throw new UnauthorizedException(e)
     }
-    return user
   }
 
   log(data: any) {

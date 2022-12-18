@@ -2,10 +2,10 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common'
 
 export const getCurrentUserIdByContext = (context: ExecutionContext): string => {
   if (context.getType() === 'http') {
-    return context.switchToHttp().getRequest().user.valueOf().userId
+    return context.switchToHttp().getRequest().userId
   }
   if (context.getType() === 'rpc') {
-    return context.switchToRpc().getData().user.valueOf().userId
+    return context.switchToRpc().getData().userId
   }
 }
 

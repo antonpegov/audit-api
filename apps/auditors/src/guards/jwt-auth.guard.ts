@@ -25,7 +25,7 @@ export class JwtAuthGuard implements CanActivate {
         jwt: authenticationString?.split(' ')[1],
       })
       .pipe(
-        tap((user) => addToContext('user', user, context)),
+        tap((userId) => addToContext('userId', userId, context)),
         catchError(() => {
           throw new UnauthorizedException()
         }),

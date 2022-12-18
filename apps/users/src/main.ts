@@ -6,22 +6,17 @@ import * as YAML from 'json-to-pretty-yaml'
 import * as fs from 'fs'
 
 import { RmqService, validationConfigurator } from '@app/common'
-import { AuthModule } from '@users/auth/auth.module'
 import { useContainer } from 'class-validator'
-import { UsersModule } from './users.module'
+import { UsersModule } from '@users/users.module'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AuthModule)
+  const app = await NestFactory.create(UsersModule)
   const configService = app.get(ConfigService)
   const rmqService = app.get<RmqService>(RmqService)
   const server = configService.get('SERVER')
   const port = configService.get('PORT')
   const config = new DocumentBuilder()
-    .addCookieAuth('authCookie', {
-      type: 'http',
-      in: 'Header',
-      scheme: 'Bearer',
-    })
+    .addBearerAuth()
     .setTitle('Users')
     .setDescription('Users API')
     .setVersion('0.1')
